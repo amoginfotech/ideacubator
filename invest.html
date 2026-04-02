@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Registration - Ideacubator</title>
+    <meta name="description"
+        content="Interested in investing? Register your interest with Ideacubator and get access to curated deal flow.">
+
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="assets/css/index.css" rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: var(--nav-h, 64px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="nav">
+        <a href="index.html" class="nav__brand">
+            <img src="assets/img/logo.png" alt="Ideacubator" height="44">
+            <span class="nav__brand-text">Ideacubator</span>
+        </a>
+        <ul class="nav__links">
+            <li><a href="index.html#philosophy">Philosophy</a></li>
+            <li><a href="index.html#models">Models</a></li>
+            <li><a href="index.html#focus">Focus Areas</a></li>
+            <li><a href="index.html#process">Process</a></li>
+            <li><a href="index.html#capital">Capital</a></li>
+            <li><a href="index.html#apply">Apply</a></li>
+        </ul>
+        <div class="nav__actions">
+            <a href="index.html#apply" class="btn btn--primary">Apply for Funding</a>
+        </div>
+    </nav>
+
+    <!-- PAGE CONTENT -->
+    <section class="section" style="padding-top: calc(var(--nav-h) + 2rem);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8" data-aos="fade-up">
+                    <div class="text-center mb-5">
+                        <span class="section__label">Investor Registration</span>
+                        <h1 class="section__title">Register as an Investor</h1>
+                        <p class="section__desc">Complete the form below to express your interest in investing with Ideacubator. We'll review your profile and get back to you.</p>
+                    </div>
+
+                    <div class="card" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+                        <form id="investorForm">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="company" class="form-label">Company / Firm</label>
+                                <input type="text" class="form-control" id="company" name="company">
+                            </div>
+                            <div class="mb-3">
+                                <label for="investmentRange" class="form-label">Typical Investment Range *</label>
+                                <select class="form-control" id="investmentRange" name="investmentRange" required>
+                                    <option value="" disabled selected>Select range...</option>
+                                    <option value="< $100K">Less than $100K</option>
+                                    <option value="$100K - $500K">$100K - $500K</option>
+                                    <option value="$500K - $1M">$500K - $1M</option>
+                                    <option value="$1M - $5M">$1M - $5M</option>
+                                    <option value="$5M+">More than $5M</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="investmentThesis" class="form-label">Investment Thesis / Focus Areas</label>
+                                <textarea class="form-control" id="investmentThesis" name="investmentThesis" rows="4"
+                                    placeholder="What types of businesses or sectors do you typically invest in?"></textarea>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="newsletter" name="newsletter">
+                                <label class="form-check-label" for="newsletter">Subscribe to our newsletter for updates</label>
+                            </div>
+                            <button type="submit" class="btn btn--primary w-100">Submit Registration</button>
+                        </form>
+
+                        <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+                            <h5>Thank you!</h5>
+                            <p class="mb-0">Your investor registration has been submitted. We'll review your profile and contact you shortly.</p>
+                        </div>
+
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <small class="text-muted">Already have an investor account? <a href="dashboard/investor.html" class="text-decoration-none">Login with Google</a></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (reuse from index but simplified) -->
+    <footer class="footer">
+        <p>&copy; 2026 Ideacubator &nbsp;&middot;&nbsp; Bangalore, India &nbsp;&middot;&nbsp; <a
+                href="https://ideacubator.in">ideacubator.in</a></p>
+    </footer>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHPuZ7fAXInpVSPF5Ki7qJwBYfRUlJ2A4",
+            authDomain: "rational-world-330006.firebaseapp.com",
+            projectId: "rational-world-330006",
+            storageBucket: "rational-world-330006.firebasestorage.app",
+            messagingSenderId: "115200442212",
+            appId: "1:115200442212:web:b2cd9d4d48738da9ed4471"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Investor form submission
+        document.getElementById('investorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Submitting...';
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                await db.collection('investorInquiries').add({
+                    ...data,
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending'
+                });
+
+                form.style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+            } catch (err) {
+                console.error('Submission failed:', err);
+                alert('Failed to submit. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Submit Registration';
+            }
+        });
+
+        // Initialize AOS
+        AOS.init({ duration: 650, easing: 'ease-out-quad', once: true });
+    </script>
+</body>
+
+</html>

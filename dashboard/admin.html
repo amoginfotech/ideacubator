@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Ideacubator</title>
+
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="../assets/css/index.css" rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: 64px;
+            background: var(--bg);
+        }
+
+        .stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-card .label {
+            font-size: .85rem;
+            color: var(--text-muted);
+        }
+
+        .table-dark {
+            --bs-table-bg: var(--bg-elevated);
+            --bs-table-border-color: var(--border);
+        }
+
+        .bg-info {
+            --bs-bg-opacity: 0.2;
+            background-color: #0dcaf0 !important;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN FORM (shown if not authenticated) -->
+    <div id="loginForm" class="login-container" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Admin Login</h3>
+                <form id="adminLogin">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary w-100">Login</button>
+                    <div class="mt-3 small text-muted text-center">
+                        Contact the system administrator for credentials.
+                    </div>
+                </form>
+                <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD (shown if authenticated) -->
+    <div id="dashboard" style="display: none;">
+        <!-- NAVBAR -->
+        <nav class="nav">
+            <a href="../index.html" class="nav__brand">
+                <img src="../assets/img/logo.png" alt="Ideacubator" height="44">
+                <span class="nav__brand-text">Ideacubator</span>
+            </a>
+            <div class="nav__actions">
+                <span class="nav__dashboard-link me-3">
+                    <i class="bi bi-shield-lock"></i> Admin
+                </span>
+                <button type="button" class="nav__logout" id="logoutBtn">Logout</button>
+            </div>
+        </nav>
+
+        <!-- DASHBOARD CONTENT -->
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="section__title mb-4">Admin Dashboard</h1>
+
+                    <!-- Loading State -->
+                    <div id="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">Loading data...</p>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="row g-3 mb-4" id="statsRow" style="display: none;">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="number" id="statApplications">0</div>
+                                <div class="label">Total Applications</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="number" id="statInvestors">0</div>
+                                <div class="label">Investor Inquiries</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="number" id="statPending">0</div>
+                                <div class="label">Pending Reviews</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="number" id="statApproved">0</div>
+                                <div class="label">Approved (This Month)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist" style="display: none;">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications" type="button">Applications</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="investors-tab" data-bs-toggle="tab" data-bs-target="#investors" type="button">Investor Inquiries</button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="adminTabContent" style="display: none;">
+                        <!-- Applications Tab -->
+                        <div class="tab-pane fade show active" id="applications" role="tabpanel">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-hover table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Profile</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="applicationsTableBody">
+                                                <!-- Populated by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Investors Tab -->
+                        <div class="tab-pane fade" id="investors" role="tabpanel">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-hover table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Company</th>
+                                                    <th>Range</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="investorsTableBody">
+                                                <!-- Populated by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Detail Modal -->
+    <div class="modal fade" id="appDetailModal" tabindex="-1" aria-labelledby="appDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appDetailModalLabel">Application Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="appDetailContent">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Initialize Firebase if not already
+        if (!firebase.apps.length) {
+            firebase.initializeApp({
+                apiKey: "AIzaSyDHPuZ7fAXInpVSPF5Ki7qJwBYfRUlJ2A4",
+                authDomain: "rational-world-330006.firebaseapp.com",
+                projectId: "rational-world-330006",
+                storageBucket: "rational-world-330006.firebasestorage.app",
+                messagingSenderId: "115200442212",
+                appId: "1:115200442212:web:b2cd9d4d48738da9ed4471"
+            });
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Simple admin authentication via Email/Password
+        // Admin users must be created in Firebase Authentication with email/password
+        // And also exist in a whitelist collection `adminWhitelist` (or you can just check email domain)
+
+        const ADMIN_EMAILS = ['your-email@gmail.com']; // Add your email here, edit this file for more admins
+
+
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const dashboard = document.getElementById('dashboard');
+        const loginError = document.getElementById('loginError');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loadingEl = document.getElementById('loading');
+        const statsRow = document.getElementById('statsRow');
+        const adminTabs = document.getElementById('adminTabs');
+        const adminTabContent = document.getElementById('adminTabContent');
+        const applicationsTableBody = document.getElementById('applicationsTableBody');
+        const investorsTableBody = document.getElementById('investorsTableBody');
+        const appDetailModal = new bootstrap.Modal(document.getElementById('appDetailModal'));
+        const appDetailContent = document.getElementById('appDetailContent');
+
+        // Auth State
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                showLogin();
+                return;
+            }
+
+            // Check if user email is in admin whitelist
+            if (ADMIN_EMAILS.includes(user.email)) {
+                showDashboard();
+            } else {
+                await auth.signOut();
+                loginError.textContent = 'Access denied. Admins only.';
+                loginError.style.display = 'block';
+                showLogin();
+            }
+        });
+
+        // Login form submit (Firebase Email/Password)
+        document.getElementById('adminLogin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                // Auth state handler will check whitelist and show dashboard if authorized
+            } catch (err) {
+                loginError.textContent = err.message || 'Login failed';
+                loginError.style.display = 'block';
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            await auth.signOut();
+            showLogin();
+        });
+
+        function showLogin() {
+            loginForm.style.display = 'block';
+            dashboard.style.display = 'none';
+            loginError.style.display = 'none';
+        }
+
+        function showDashboard() {
+            loginForm.style.display = 'none';
+            dashboard.style.display = 'block';
+            loadData();
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return '-';
+            return timestamp.toDate().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'new': 'bg-info',
+                'submitted': 'bg-info',
+                'under_review': 'bg-warning text-dark',
+                'interview': 'bg-primary',
+                'approved': 'bg-success',
+                'rejected': 'bg-danger',
+                'pending': 'bg-warning text-dark',
+                'contacted': 'bg-info'
+            };
+            const label = status.replace('_', ' ');
+            return `<span class="badge ${badges[status] || 'bg-secondary'}">${label}</span>`;
+        }
+
+        function showApplicationDetails(appData) {
+            let html = `<div class="mb-3">
+                <strong>Profile:</strong> ${appData.profileSelected}<br>
+                <strong>Status:</strong> ${getStatusBadge(appData.status || 'new')}<br>
+                <strong>Submitted:</strong> ${formatDate(appData.submittedAt)}
+            </div><hr><h6>Form Data</h6><pre class="bg-dark p-3 rounded" style="max-height: 500px; overflow-y: auto; font-size: 0.85rem;">${JSON.stringify(appData, null, 2)}</pre>`;
+            appDetailContent.innerHTML = html;
+            appDetailModal.show();
+        }
+
+        async function updateApplicationStatus(appDocId, newStatus) {
+            try {
+                await firebase.firestore().collection('applications').doc(appDocId).update({ status: newStatus });
+                alert(`Application status updated to: ${newStatus}`);
+                loadData();
+            } catch (err) {
+                console.error('Error updating application:', err);
+                alert('Failed to update application');
+            }
+        }
+
+        async function updateInvestorStatus(inqDocId, status) {
+            try {
+                await firebase.firestore().collection('investorInquiries').doc(inqDocId).update({ status, reviewedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                alert(`Investor ${status}`);
+                loadData();
+            } catch (err) {
+                console.error('Error updating investor:', err);
+                alert('Failed to update status');
+            }
+        }
+
+        async function loadData() {
+            try {
+                const [appsSnap, investorsSnap] = await Promise.all([
+                    firebase.firestore().collection('applications').orderBy('submittedAt', 'desc').get(),
+                    firebase.firestore().collection('investorInquiries').orderBy('submittedAt', 'desc').get()
+                ]);
+
+                // Stats
+                document.getElementById('statApplications').textContent = appsSnap.size;
+                document.getElementById('statInvestors').textContent = investorsSnap.size;
+                document.getElementById('statPending').textContent = investorsSnap.docs.filter(d => d.data().status === 'pending').size;
+
+                // Applications table
+                applicationsTableBody.innerHTML = appsSnap.docs.map(doc => {
+                    const data = doc.data();
+                    return `
+                        <tr>
+                            <td>${formatDate(data.submittedAt)}</td>
+                            <td>${data.founderName || data.founderEmail || 'Anonymous'}</td>
+                            <td>${data.founderEmail || '-'}</td>
+                            <td>${data.profileSelected || '-'}</td>
+                            <td>
+                                <select class="form-select form-select-sm" onchange="updateApplicationStatus('${doc.id}', this.value)" style="width: auto; display: inline-block;">
+                                    <option value="new" ${data.status === 'new' ? 'selected' : ''}>New</option>
+                                    <option value="under_review" ${data.status === 'under_review' ? 'selected' : ''}>Under Review</option>
+                                    <option value="interview" ${data.status === 'interview' ? 'selected' : ''}>Interview</option>
+                                    <option value="approved" ${data.status === 'approved' ? 'selected' : ''}>Approved</option>
+                                    <option value="rejected" ${data.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn--outline" onclick='showApplicationDetails(${JSON.stringify(data).replace(/'/g, "&apos;")})'>Details</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Investors table
+                investorsTableBody.innerHTML = investorsSnap.docs.map(doc => {
+                    const data = doc.data();
+                    return `
+                        <tr>
+                            <td>${formatDate(data.submittedAt)}</td>
+                            <td>${data.name}</td>
+                            <td>${data.email}</td>
+                            <td>${data.company || '-'}</td>
+                            <td>${data.investmentRange || '-'}</td>
+                            <td>${getStatusBadge(data.status || 'pending')}</td>
+                            <td>
+                                ${data.status === 'pending' ? `
+                                    <button class="btn btn-sm btn-success" onclick="updateInvestorStatus('${doc.id}', 'approved')">Approve</button>
+                                    <button class="btn btn-sm btn-danger" onclick="updateInvestorStatus('${doc.id}', 'rejected')">Reject</button>
+                                ` : '<span class="text-muted">-</span>'}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                loadingEl.style.display = 'none';
+                statsRow.style.display = 'flex';
+                adminTabs.style.display = 'flex';
+                adminTabContent.style.display = 'block';
+
+            } catch (err) {
+                console.error('Error loading data:', err);
+                loadingEl.innerHTML = '<p class="text-danger">Error loading data. Check that Firebase is configured.</p>';
+            }
+        }
+    </script>
+
+    <!-- Firebase (initialize if not already) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        if (!firebase.apps.length) {
+            firebase.initializeApp({
+                apiKey: "AIzaSyDHPuZ7fAXInpVSPF5Ki7qJwBYfRUlJ2A4",
+                authDomain: "rational-world-330006.firebaseapp.com",
+                projectId: "rational-world-330006",
+                storageBucket: "rational-world-330006.firebasestorage.app",
+                messagingSenderId: "115200442212",
+                appId: "1:115200442212:web:b2cd9d4d48738da9ed4471"
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -3,116 +3,136 @@
 
 <head>
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Ideacubator – Venture Funding &amp; Incubation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideacubator – Venture Funding & Incubation</title>
     <meta name="description"
         content="Ideacubator partners with ambitious founders across India through flexible investment, venture-building, and funding models. Apply for funding today.">
 
-    <!-- CDN Dependencies (matching index.html) -->
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/css/index.css">
-    <link rel="stylesheet" href="assets/css/ventures.css">
+    <link href="assets/css/index.css" rel="stylesheet">
 </head>
 
 <body>
 
     <!-- NAVBAR -->
-    <nav class="ap-nav">
-        <a href="index.html" class="brand">
-            <img src="assets/img/logo.png" alt="Ideacubator" height="44" style="display:block;border-radius:6px;">
-            <span class="brand-text">Ideacubator</span>
+    <nav class="nav">
+        <a href="index.html" class="nav__brand">
+            <img src="assets/img/logo.png" alt="Ideacubator" height="44">
+            <span class="nav__brand-text">Ideacubator</span>
         </a>
-        <ul class="nav-links">
+        <ul class="nav__links">
             <li><a href="#philosophy">Philosophy</a></li>
             <li><a href="#models">Models</a></li>
             <li><a href="#focus">Focus Areas</a></li>
             <li><a href="#process">Process</a></li>
             <li><a href="#capital">Capital</a></li>
+            <li><a href="#apply">Apply</a></li>
         </ul>
-        <a href="#apply" class="btn-apply">Apply Now</a>
+        <div class="nav__actions">
+            <a href="dashboard/founder.html" class="nav__dashboard-link" style="display: none;">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <button type="button" class="nav__cta" id="loginBtn" data-bs-toggle="modal" data-bs-target="#loginModal">
+                Login
+            </button>
+            <button type="button" class="nav__cta nav__logout" style="display: none;" id="logoutBtn">
+                Logout
+            </button>
+        </div>
     </nav>
 
-    <!-- HERO -->
-    <section class="hero-section" id="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-grid"></div>
-        <div class="container">
-            <div class="row align-items-center gy-5">
-                <div class="col-lg-6" data-aos="fade-right" data-aos-duration="800">
-                    <div class="hero-badge"><i class="bi bi-stars"></i> Venture Capital &amp; Studio</div>
-                    <h1 class="hero-title">Capital. Structure. <span class="gradient-text">Execution.</span></h1>
-                    <p class="hero-subtitle">Ideacubator partners with ambitious founders across India through flexible
-                        investment and venture-building models — designed for those building something durable.</p>
-                    <div class="hero-ctas">
-                        <a href="#apply" class="btn-primary-glow"><i class="bi bi-rocket-takeoff-fill"></i> Submit Your
-                            Application</a>
-                        <a href="#models" class="btn-outline-glow"><i class="bi bi-grid-fill"></i> Explore Models</a>
-                    </div>
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <div class="stat-num">4</div>
-                            <div class="stat-label">Engagement Models</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-num">Stage-Agnostic</div>
-                            <div class="stat-label">Idea to Scale</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-num">14d</div>
-                            <div class="stat-label">Response Time</div>
-                        </div>
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="loginModalLabel">Sign In</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center pt-4">
+                    <p class="text-muted mb-4">Sign in with your Google account to access your dashboard</p>
+                    <button type="button" class="btn btn--primary btn-lg w-100" id="google-signin-btn">
+                        <i class="bi bi-google me-2"></i> Continue with Google
+                    </button>
+                    <div class="mt-3 small text-muted">
+                        <i class="bi bi-info-circle"></i> Founders: Apply first, then sign in to track your application.
                     </div>
                 </div>
-                <div class="col-lg-6" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
-                    <div class="hero-image-wrap">
-                        <div class="hero-image-glow"></div>
-                        <img src="assets/img/skillsfuture-hero.png" alt="Ideacubator" loading="eager">
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 text-center" data-aos="fade-up" data-aos-duration="800">
+                    <span class="hero__badge"><i class="bi bi-stars"></i> Venture Capital & Studio</span>
+                    <h1 class="hero__title">Capital. Structure. Execution.</h1>
+                    <p class="hero__subtitle">We partner with ambitious founders through flexible investment and venture-building models.</p>
+                    <div class="hero__ctas">
+                        <a href="#apply" class="btn btn--primary">Have an Idea? Apply Now</a>
+                        <a href="invest.html" class="btn btn--outline">Want to Invest? Register</a>
+                        <button type="button" class="btn btn--outline" data-bs-toggle="modal" data-bs-target="#loginModal">Founder/Investor Login</button>
+                    </div>
+                    <div class="hero__stats">
+                        <div class="hero__stat">
+                            <div class="hero__stat-value">4</div>
+                            <div class="hero__stat-label">Engagement Models</div>
+                        </div>
+                        <div class="hero__stat">
+                            <div class="hero__stat-value">Stage-Agnostic</div>
+                            <div class="hero__stat-label">Idea to Scale</div>
+                        </div>
+                        <div class="hero__stat">
+                            <div class="hero__stat-value">14d</div>
+                            <div class="hero__stat-label">Response Time</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- WHY / PHILOSOPHY -->
-    <section class="why-section" id="philosophy">
+    <!-- PHILOSOPHY -->
+    <section class="section section--philosophy" id="philosophy">
         <div class="container">
-            <div class="row">
+            <div class="row gy-5">
                 <div class="col-lg-5" data-aos="fade-right">
-                    <span class="section-label">Our Philosophy</span>
-                    <h2 class="section-title">Structure is not a constraint.<br>It is the foundation of durability.</h2>
-                    <p class="section-desc">We believe strong ideas require structure. Capital alone is not enough.
+                    <span class="section__label">Our Philosophy</span>
+                    <h2 class="section__title">Structure is not a constraint.<br>It is the foundation of durability.</h2>
+                    <p class="section__desc">We believe strong ideas require structure. Capital alone is not enough.
                         Execution discipline — applied consistently and early — is what separates ventures that last
                         from those that don't.</p>
                 </div>
-                <div class="col-lg-7 mt-5 mt-lg-0">
-                    <div class="differentiator-grid" data-aos="fade-up" data-aos-delay="100">
-                        <div class="diff-card">
-                            <div class="diff-icon"><i class="bi bi-building-gear"></i></div>
+                <div class="col-lg-7">
+                    <div class="card-grid card-grid--2col" data-aos="fade-up" data-aos-delay="100">
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-building-gear"></i></div>
                             <h4>Capital Requires Structure</h4>
                             <p>Every investment we make is paired with a defined governance and reporting framework.
                                 Accountability is not optional — it is the model.</p>
                         </div>
-                        <div class="diff-card">
-                            <div class="diff-icon"><i class="bi bi-trophy-fill"></i></div>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-speedometer2"></i></div>
                             <h4>Execution is the Differentiator</h4>
                             <p>Ideas are common. The ability to execute with speed, clarity, and discipline is not. We
                                 assess and support both with equal weight.</p>
                         </div>
-                        <div class="diff-card">
-                            <div class="diff-icon"><i class="bi bi-shield-check"></i></div>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-shield-check"></i></div>
                             <h4>Governance Protects Both Sides</h4>
                             <p>Well-defined governance serves founders and investors equally. It reduces ambiguity,
                                 surfaces problems early, and preserves relationships.</p>
                         </div>
-                        <div class="diff-card">
-                            <div class="diff-icon"><i class="bi bi-sliders"></i></div>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-sliders"></i></div>
                             <h4>Flexible by Design</h4>
                             <p>We adapt our engagement model to the founder's stage, strength, and ambition. There is no
                                 single template — only structured outcomes.</p>
@@ -123,199 +143,162 @@
         </div>
     </section>
 
-    <!-- MODEL CARDS SIDE BY SIDE -->
-    <section class="tracks-section" id="models">
+    <!-- MODELS -->
+    <section class="section section--models" id="models">
         <div class="container">
-            <div class="section-title-center" data-aos="fade-up">
-                <span class="section-label">Engagement Models</span>
-                <h2 class="section-title">Four Ways to Partner</h2>
-                <p class="section-desc">We do not operate a single funding template. Each model is designed for a
-                    specific founder profile, stage, and ambition level — all governed with the same disciplined rigor.
-                </p>
+            <div class="section section--centered" data-aos="fade-up">
+                <span class="section__label">Engagement Models</span>
+                <h2 class="section__title">Four Ways to Partner</h2>
+                <p class="section__desc">Each model is designed for a specific founder profile, stage, and ambition level.</p>
             </div>
-            <div class="model-grid" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-grid card-grid--4col" data-aos="fade-up" data-aos-delay="100">
                 <!-- Model A -->
-                <div class="v-model-card">
-                    <div class="v-model-letter">A</div>
+                <div class="card card--model">
                     <h3>Founder-Led Investment</h3>
-                    <div class="v-model-tagline">Capital. Minority. Control stays with you.</div>
-                    <ul class="v-model-list">
-                        <li><i class="bi bi-check-circle-fill"></i> Minority equity stake — founder retains full
-                            operational control</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Structured governance and reporting defined upfront
-                        </li>
-                        <li><i class="bi bi-check-circle-fill"></i> Milestone-based capital deployment in tranches</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Quarterly review cadence with defined KPIs</li>
-                        <li><i class="bi bi-check-circle-fill"></i> No board seat unless mutually agreed post-Series A
-                        </li>
+                    <p class="card__tagline">Capital. Minority. Control stays with you.</p>
+                    <ul class="card__features">
+                        <li>Minority equity stake — founder retains full operational control</li>
+                        <li>Structured governance and reporting defined upfront</li>
+                        <li>Milestone-based capital deployment in tranches</li>
+                        <li>Quarterly review cadence with defined KPIs</li>
+                        <li>No board seat unless mutually agreed post-Series A</li>
                     </ul>
-                    <div class="v-model-discipline"><i class="bi bi-shield-check"></i> Diligence-first. Capital follows
-                        conviction.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> Diligence-first. Capital follows conviction.</div>
                 </div>
 
                 <!-- Model B -->
-                <div class="v-model-card">
-                    <div class="v-model-letter">B</div>
+                <div class="card card--model">
                     <h3>Venture Partnership</h3>
-                    <div class="v-model-tagline">Capital + strategic guidance. Scaled together.</div>
-                    <ul class="v-model-list">
-                        <li><i class="bi bi-check-circle-fill"></i> Capital investment with active strategic involvement
-                        </li>
-                        <li><i class="bi bi-check-circle-fill"></i> Defined board structure agreed before engagement
-                        </li>
-                        <li><i class="bi bi-check-circle-fill"></i> Structured 18-month scaling roadmap with clear
-                            milestones</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Monthly operational review, quarterly board review
-                        </li>
-                        <li><i class="bi bi-check-circle-fill"></i> Network access, hiring support, and market entry
-                            guidance</li>
+                    <p class="card__tagline">Capital + strategic guidance. Scaled together.</p>
+                    <ul class="card__features">
+                        <li>Capital investment with active strategic involvement</li>
+                        <li>Defined board structure agreed before engagement</li>
+                        <li>Structured 18-month scaling roadmap with clear milestones</li>
+                        <li>Monthly operational review, quarterly board review</li>
+                        <li>Network access, hiring support, and market entry guidance</li>
                     </ul>
-                    <div class="v-model-discipline"><i class="bi bi-shield-check"></i> Partnership with accountability
-                        at every stage.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> Partnership with accountability at every stage.</div>
                 </div>
 
                 <!-- Model C -->
-                <div class="v-model-card">
-                    <div class="v-model-letter">C</div>
+                <div class="card card--model">
                     <h3>Studio Build</h3>
-                    <div class="v-model-tagline">Capital + team. Co-build from ground up.</div>
-                    <ul class="v-model-list">
-                        <li><i class="bi bi-check-circle-fill"></i> Internal product team co-executes the build</li>
-                        <li><i class="bi bi-check-circle-fill"></i> AI-augmented development for faster MVP execution
-                        </li>
-                        <li><i class="bi bi-check-circle-fill"></i> Shared equity structure with vesting milestones</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Sprint-based delivery with joint review every two
-                            weeks</li>
-                        <li><i class="bi bi-check-circle-fill"></i> IP ownership clearly defined in partnership
-                            agreement</li>
+                    <p class="card__tagline">Capital + team. Co-build from ground up.</p>
+                    <ul class="card__features">
+                        <li>Internal product team co-executes the build</li>
+                        <li>AI-augmented development for faster MVP execution</li>
+                        <li>Shared equity structure with vesting milestones</li>
+                        <li>Sprint-based delivery with joint review every two weeks</li>
+                        <li>IP ownership clearly defined in partnership agreement</li>
                     </ul>
-                    <div class="v-model-discipline"><i class="bi bi-shield-check"></i> You bring the vision. We bring
-                        the execution engine.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> You bring the vision. We bring the execution engine.</div>
                 </div>
 
                 <!-- Model D -->
-                <div class="v-model-card">
-                    <div class="v-model-letter">D</div>
+                <div class="card card--model">
                     <h3>Validation Sprint</h3>
-                    <div class="v-model-tagline">Pre-investment. Structured feasibility first.</div>
-                    <ul class="v-model-list">
-                        <li><i class="bi bi-check-circle-fill"></i> 8–12 week structured validation sprint before
-                            capital commitment</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Market testing, customer discovery, and feasibility
-                            assessment</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Joint sprint deliverables with measurable validation
-                            criteria</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Investment decision made transparently
-                            post-validation</li>
-                        <li><i class="bi bi-check-circle-fill"></i> Full investment available if validation criteria are
-                            met</li>
+                    <p class="card__tagline">Pre-investment. Structured feasibility first.</p>
+                    <ul class="card__features">
+                        <li>8–12 week structured validation sprint before capital commitment</li>
+                        <li>Market testing, customer discovery, and feasibility assessment</li>
+                        <li>Joint sprint deliverables with measurable validation criteria</li>
+                        <li>Investment decision made transparently post-validation</li>
+                        <li>Full investment available if validation criteria are met</li>
                     </ul>
-                    <div class="v-model-discipline"><i class="bi bi-shield-check"></i> Conviction built on evidence, not
-                        optimism.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> Conviction built on evidence, not optimism.</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- WHAT WE LOOK FOR -->
-    <section class="outcomes-section" id="founders">
+    <section class="section section--founders" id="founders">
         <div class="container">
-            <div class="section-title-center" data-aos="fade-up">
-                <span class="section-label">What We Look For</span>
-                <h2 class="section-title">We evaluate both the idea and the founder.</h2>
-                <p class="section-desc">Strong ideas submitted by weak founders rarely succeed. Exceptional founders in
-                    average markets frequently do. We apply equal scrutiny to both dimensions.</p>
+            <div class="section section--centered" data-aos="fade-up">
+                <span class="section__label">What We Look For</span>
+                <h2 class="section__title">We evaluate both the idea and the founder.</h2>
+                <p class="section__desc">Strong ideas submitted by weak founders rarely succeed. Exceptional founders in average markets frequently do.</p>
             </div>
-            <div class="role-grid" data-aos="fade-up" data-aos-delay="100">
-                <div class="role-card">
-                    <div class="role-icon">💡</div>
+            <div class="card-grid card-grid--auto" data-aos="fade-up" data-aos-delay="100">
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-lightbulb"></i></div>
                     <h4>Clarity of Thinking</h4>
-                    <p>Can you articulate the problem, solution, and market without jargon? Clarity is a signal of
-                        depth.</p>
+                    <p>Can you articulate the problem, solution, and market without jargon?</p>
                 </div>
-                <div class="role-card">
-                    <div class="role-icon">🔍</div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-search"></i></div>
                     <h4>Problem Insight</h4>
                     <p>Do you understand the problem at a structural level — not just surface symptoms?</p>
                 </div>
-                <div class="role-card">
-                    <div class="role-icon">🤝</div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-handshake"></i></div>
                     <h4>Integrity</h4>
-                    <p>We conduct reference checks. We value founders who disclose risks as readily as opportunities.
-                    </p>
+                    <p>We conduct reference checks. We value founders who disclose risks openly.</p>
                 </div>
-                <div class="role-card">
-                    <div class="role-icon">⚡</div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-lightning"></i></div>
                     <h4>Commitment</h4>
-                    <p>Are you fully committed to this venture? Part-time founders in full-time markets are a structural
-                        disadvantage.</p>
+                    <p>Part-time founders in full-time markets face a structural disadvantage.</p>
                 </div>
-                <div class="role-card">
-                    <div class="role-icon">🚀</div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-rocket-takeoff"></i></div>
                     <h4>Execution Speed</h4>
                     <p>Speed of iteration — in product, in learning, in pivoting — is a core signal.</p>
                 </div>
-                <div class="role-card">
-                    <div class="role-icon">🔄</div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-arrow-clockwise"></i></div>
                     <h4>Coachability</h4>
-                    <p>Strong founders evaluate feedback on merit and integrate what is useful with speed.</p>
+                    <p>Strong founders evaluate feedback on merit and integrate what is useful.</p>
                 </div>
-                <div class="role-card">
-                    <div class="role-icon">📊</div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-graph-up"></i></div>
                     <h4>Market Realism</h4>
-                    <p>₹1000Cr SAM claims require evidence. We favour founders who understand their market precisely.
-                    </p>
+                    <p>We favour founders who understand their market precisely — with evidence.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- FOCUS AREAS -->
-    <section class="campus-section" id="focus">
+    <section class="section section--focus" id="focus">
         <div class="container">
-            <div class="row align-items-center gy-5">
+            <div class="row gy-5">
                 <div class="col-lg-5" data-aos="fade-right">
-                    <span class="section-label">Investment Focus</span>
-                    <h2 class="section-title">Where We Deploy Capital</h2>
-                    <p class="section-desc">We invest where technology creates structural advantage — not just
-                        efficiency. Our focus areas are chosen for defensibility, market size, and alignment with
-                        AI-augmented execution.</p>
+                    <span class="section__label">Investment Focus</span>
+                    <h2 class="section__title">Where We Deploy Capital</h2>
+                    <p class="section__desc">We invest where technology creates structural advantage — not just efficiency.</p>
                 </div>
                 <div class="col-lg-7" data-aos="fade-left" data-aos-delay="100">
-                    <div class="campus-grid">
-                        <div class="campus-card">
-                            <div class="campus-icon"><i class="bi bi-cpu-fill"></i></div>
+                    <div class="card-grid card-grid--3col">
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-cpu-fill"></i></div>
                             <h4>AI-Enabled Platforms</h4>
-                            <p>Products where AI is a core architectural layer — not a feature added to an existing
-                                solution.</p>
+                            <p>Products where AI is a core architectural layer — not a feature added to an existing solution.</p>
                         </div>
-                        <div class="campus-card">
-                            <div class="campus-icon"><i class="bi bi-building"></i></div>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-building"></i></div>
                             <h4>B2B SaaS</h4>
-                            <p>Vertical SaaS targeting underserved enterprise workflows, particularly in regulated
-                                industries.</p>
+                            <p>Vertical SaaS targeting underserved enterprise workflows, particularly in regulated industries.</p>
                         </div>
-                        <div class="campus-card">
-                            <div class="campus-icon"><i class="bi bi-braces-asterisk"></i></div>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-braces-asterisk"></i></div>
                             <h4>Deep Technology</h4>
                             <p>Defensible technology built on research, proprietary data, or hard engineering.</p>
                         </div>
-                        <div class="campus-card">
-                            <div class="campus-icon"><i class="bi bi-gear-wide-connected"></i></div>
-                            <h4>Automation &amp; Productivity</h4>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-gear-wide-connected"></i></div>
+                            <h4>Automation & Productivity</h4>
                             <p>Workflow automation, intelligent process execution, and human-AI collaboration tools.</p>
                         </div>
-                        <div class="campus-card">
-                            <div class="campus-icon"><i class="bi bi-server"></i></div>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-server"></i></div>
                             <h4>Scalable Infrastructure</h4>
-                            <p>Foundational platforms that enable other businesses to operate — data pipelines, API
-                                ecosystems.</p>
+                            <p>Foundational platforms that enable other businesses to operate — data pipelines, API ecosystems.</p>
                         </div>
-                        <div class="campus-card">
-                            <div class="campus-icon"><i class="bi bi-globe-americas"></i></div>
+                        <div class="card">
+                            <div class="card__icon"><i class="bi bi-globe-americas"></i></div>
                             <h4>High-Impact Markets</h4>
-                            <p>India-origin businesses with global reach potential, and global businesses targeting
-                                India.</p>
+                            <p>India-origin businesses with global reach potential, and global businesses targeting India.</p>
                         </div>
                     </div>
                 </div>
@@ -324,130 +307,104 @@
     </section>
 
     <!-- EVALUATION PROCESS -->
-    <section class="delivery-section" id="process">
+    <section class="section section--process" id="process">
         <div class="container">
-            <div class="section-title-center" data-aos="fade-up">
-                <span class="section-label">Evaluation Process</span>
-                <h2 class="section-title">Structured. Transparent. Rigorous.</h2>
-                <p class="section-desc">Every application is reviewed. Not all applications proceed. Our process is
-                    designed to reach a clear decision — in either direction — within a defined timeframe.</p>
+            <div class="section section--centered" data-aos="fade-up">
+                <span class="section__label">Evaluation Process</span>
+                <h2 class="section__title">Structured. Transparent. Rigorous.</h2>
+                <p class="section__desc">Our process reaches a clear decision within a defined timeframe.</p>
             </div>
-            <div class="delivery-grid" data-aos="fade-up" data-aos-delay="100">
-                <div class="delivery-item">
-                    <div class="d-icon"><i class="bi bi-file-earmark-check-fill"></i></div>
-                    <div>
-                        <h5>01 · Application Review</h5>
-                        <p>Every application reviewed within 14 business days. You will receive a response regardless of
-                            outcome.</p>
-                    </div>
+            <div class="card-grid card-grid--2col" data-aos="fade-up" data-aos-delay="100">
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-file-earmark-check-fill"></i></div>
+                    <h5>01 · Application Review</h5>
+                    <p>Every application reviewed within 14 business days. You will receive a response regardless of outcome.</p>
                 </div>
-                <div class="delivery-item">
-                    <div class="d-icon"><i class="bi bi-chat-dots-fill"></i></div>
-                    <div>
-                        <h5>02 · Screening Discussion</h5>
-                        <p>A 45-minute structured conversation. We assess the founder directly — not through the pitch
-                            deck.</p>
-                    </div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-chat-dots-fill"></i></div>
+                    <h5>02 · Screening Discussion</h5>
+                    <p>A 45-minute structured conversation. We assess the founder directly — not through the pitch deck.</p>
                 </div>
-                <div class="delivery-item">
-                    <div class="d-icon"><i class="bi bi-graph-up-arrow"></i></div>
-                    <div>
-                        <h5>03 · Technical &amp; Commercial Assessment</h5>
-                        <p>Product review, market analysis, financial model scrutiny, and reference conversations.</p>
-                    </div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h5>03 · Technical & Commercial Assessment</h5>
+                    <p>Product review, market analysis, financial model scrutiny, and reference conversations.</p>
                 </div>
-                <div class="delivery-item">
-                    <div class="d-icon"><i class="bi bi-flask-fill"></i></div>
-                    <div>
-                        <h5>04 · Validation Sprint</h5>
-                        <p>For early-stage applications: a structured 8–12 week validation sprint before committing
-                            capital.</p>
-                    </div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-flask-fill"></i></div>
+                    <h5>04 · Validation Sprint</h5>
+                    <p>For early-stage applications: a structured 8–12 week validation sprint before committing capital.</p>
                 </div>
-                <div class="delivery-item">
-                    <div class="d-icon"><i class="bi bi-bank2"></i></div>
-                    <div>
-                        <h5>05 · Investment Committee</h5>
-                        <p>Decision communicated within 5 business days of committee meeting — with clear rationale.</p>
-                    </div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-bank2"></i></div>
+                    <h5>05 · Investment Committee</h5>
+                    <p>Decision communicated within 5 business days of committee meeting — with clear rationale.</p>
                 </div>
-                <div class="delivery-item">
-                    <div class="d-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
-                    <div>
-                        <h5>06 · Structured Onboarding</h5>
-                        <p>4-week onboarding — governance setup, reporting cadence, milestone documentation, team
-                            integration.</p>
-                    </div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
+                    <h5>06 · Structured Onboarding</h5>
+                    <p>4-week onboarding — governance setup, reporting cadence, milestone documentation, team integration.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- CAPITAL DEPLOYMENT -->
-    <section class="admission-section" id="capital">
+    <section class="section section--capital" id="capital">
         <div class="container">
-            <div class="section-title-center" data-aos="fade-up">
-                <span class="section-label">Capital Deployment</span>
-                <h2 class="section-title">Discipline is not control.</h2>
-                <p class="section-desc">Our capital deployment framework is designed to protect the health of the
-                    venture — not to restrict the founder. Every structure is explained, negotiated, and mutually
-                    agreed.</p>
+            <div class="section section--centered" data-aos="fade-up">
+                <span class="section__label">Capital Deployment</span>
+                <h2 class="section__title">Discipline is not control.</h2>
+                <p class="section__desc">Our framework protects the health of the venture — not to restrict the founder.</p>
             </div>
-            <div class="admission-steps" data-aos="fade-up" data-aos-delay="100">
-                <div class="admission-step">
-                    <div class="step-circle"><i class="bi bi-layers-fill"></i></div>
+            <div class="card-grid card-grid--flex" data-aos="fade-up" data-aos-delay="100">
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-layers-fill"></i></div>
                     <h4>Milestone-Based Tranching</h4>
-                    <p>Capital deployed in structured tranches tied to agreed milestones — revenue, product, team, or
-                        market.</p>
+                    <p>Capital deployed in structured tranches tied to agreed milestones — revenue, product, team, or market.</p>
                 </div>
-                <div class="admission-step">
-                    <div class="step-circle"><i class="bi bi-person-lock-fill"></i></div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-person-lock-fill"></i></div>
                     <h4>Founder Vesting</h4>
-                    <p>Founder vesting schedules agreed upfront — protecting both the founder's stake and venture
-                        stability.</p>
+                    <p>Founder vesting schedules agreed upfront — protecting both the founder's stake and venture stability.</p>
                 </div>
-                <div class="admission-step">
-                    <div class="step-circle"><i class="bi bi-diagram-2-fill"></i></div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-diagram-2-fill"></i></div>
                     <h4>Governance Clarity</h4>
-                    <p>Voting rights, board composition, and exit provisions defined in plain language before
-                        investment.</p>
+                    <p>Voting rights, board composition, and exit provisions defined in plain language before investment.</p>
                 </div>
-                <div class="admission-step">
-                    <div class="step-circle"><i class="bi bi-clock-history"></i></div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-clock-history"></i></div>
                     <h4>Long-Term Alignment</h4>
                     <p>We invest for meaningful time horizons. Not optimizing for quick exits.</p>
                 </div>
             </div>
-            <div class="admission-steps mt-5" data-aos="fade-up" data-aos-delay="200">
-                <div class="admission-step">
-                    <div class="step-circle"><i class="bi bi-bar-chart-fill"></i></div>
+            <div class="card-grid card-grid--flex mt-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-bar-chart-fill"></i></div>
                     <h4>Reporting Expectations</h4>
                     <p>Monthly operational update. Quarterly financial review. No surprises policy.</p>
                 </div>
-                <div class="admission-step">
-                    <div class="step-circle"><i class="bi bi-shield-fill-check"></i></div>
+                <div class="card">
+                    <div class="card__icon"><i class="bi bi-shield-fill-check"></i></div>
                     <h4>Founder Protections</h4>
-                    <p>Anti-dilution, co-sale rights, and reasonable founder protections standard in our term sheets.
-                    </p>
+                    <p>Anti-dilution, co-sale rights, and reasonable founder protections standard in our term sheets.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- APPLICATION FORM WITH DROPDOWN -->
-    <section class="form-section" id="apply">
+    <!-- APPLICATION FORM -->
+    <section class="section section--apply" id="apply">
         <div class="container">
-            <div class="form-wrap" data-aos="fade-up">
-                <span class="section-label">Apply</span>
-                <h2 class="section-title">Submit Your Application</h2>
-                <p class="section-desc">We tailor our evaluation based on your specific profile. Please select the
-                    option that best describes your current stage below.</p>
+            <div class="form" data-aos="fade-up">
+                <span class="section__label">Apply</span>
+                <h2 class="section__title">Submit Your Application</h2>
+                <p class="section__desc">Please select the option that best describes your current stage.</p>
 
-                <div class="mt-4">
-                    <label class="form-group-label-vn"
-                        style="display:block;font-size:0.875rem;font-weight:700;color:var(--text-body);margin-bottom:12px;">Which
-                        best describes you?</label>
-                    <select id="profileSelector" class="v-select" required>
+                <div class="form__field mt-4">
+                    <label for="profileSelector">Which best describes you?</label>
+                    <select id="profileSelector" class="form__select" required>
                         <option value="" disabled selected>Select your profile to load the application...</option>
                         <option value="college">1. College student seeking investment for an idea</option>
                         <option value="employed">2. Employed professional with an idea (we build it)</option>
@@ -458,315 +415,39 @@
                         <option value="test">7. Market Test an Idea before a Big Launch</option>
                         <option value="valuation">8. Need to Value my Business</option>
                         <option value="domestic_int">9. Domestic Business seeking International Sales Partner</option>
-                        <option value="int_domestic">10. International Business seeking Domestic (India) Sales Partner
-                        </option>
+                        <option value="int_domestic">10. International Business seeking Domestic (India) Sales Partner</option>
                     </select>
                 </div>
 
-                <form id="dynamicForm" class="v-form" style="display:none;" onsubmit="handleSubmit(event)">
+                <form id="dynamicForm" class="form__dynamic" style="display:none;">
                     <div id="dynamicFormFields"></div>
-
-                    <div class="d-flex align-items-center gap-4 mt-5 flex-wrap">
-                        <button type="submit" class="v-btn-submit">Submit Application <i
-                                class="bi bi-arrow-right ms-2"></i></button>
-                        <p class="form-submit-note"
-                            style="font-size:0.8rem;color:var(--text-muted);margin:0;line-height:1.6;">Applications are
-                            typically reviewed within 14 business days.<br>You will receive a response regardless of
-                            outcome.</p>
+                    <div class="form__actions mt-5">
+                        <button type="submit" class="btn btn--primary"><i class="bi bi-send-fill"></i> Submit Application</button>
+                        <p class="form__note">Applications are typically reviewed within 14 business days. You will receive a response regardless of outcome.</p>
                     </div>
                 </form>
 
-                <div id="form-success"
-                    style="display:none;margin-top:32px;padding:24px 28px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:12px;text-align:center;">
-                    <h4 style="color:var(--green);font-family:'Outfit',sans-serif;">Application Received</h4>
-                    <p class="mt-2" style="color:var(--text-body);">Thank you. Your application has been submitted. We
-                        will review it and respond within 14 business days.</p>
+                <div id="form-success" class="form__success">
+                    <h4>Application Received</h4>
+                    <p>Thank you. Your application has been submitted. We will review it and respond within 14 business days.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="ap-footer">
-        <p>&copy; 2026 Ideacubator &nbsp;·&nbsp; Bangalore, India &nbsp;·&nbsp; <a href="https://ideacubator.in"
-                style="color:var(--accent);text-decoration:none;">ideacubator.in</a></p>
-        <p style="margin-top:6px;font-size:0.78rem;"><a href="mailto:hello@ideacubator.in"
-                style="color:var(--accent);text-decoration:none;">hello@ideacubator.in</a></p>
+    <footer class="footer">
+        <p>&copy; 2026 Ideacubator &nbsp;&middot;&nbsp; Bangalore, India &nbsp;&middot;&nbsp; <a href="https://ideacubator.in">ideacubator.in</a></p>
+        <p class="footer__contact"><a href="mailto:hello@ideacubator.in">hello@ideacubator.in</a></p>
     </footer>
 
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-    <script>
-        // ─────────────────────────────────────────────────────────
-        // FIREBASE CONFIG — replace all placeholder values below
-        // ─────────────────────────────────────────────────────────
-        const firebaseConfig = {
-            apiKey: "REPLACE_WITH_YOUR_API_KEY",
-            authDomain: "REPLACE_WITH_YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
-            storageBucket: "REPLACE_WITH_YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "REPLACE_WITH_YOUR_SENDER_ID",
-            appId: "REPLACE_WITH_YOUR_APP_ID"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // ─────────────────────────────────────────────────────────
-        // Dynamic Form Configuration
-        // ─────────────────────────────────────────────────────────
-        const commonCore = [
-            { id: 'founderName', label: 'Full Name *', type: 'text', col: 'col-md-6', required: true, placeholder: 'Your full name' },
-            { id: 'founderEmail', label: 'Email Address *', type: 'email', col: 'col-md-6', required: true, placeholder: 'you@company.com' },
-            { id: 'founderPhone', label: 'Phone / WhatsApp', type: 'tel', col: 'col-md-6', placeholder: '+91 XXXXX XXXXX' },
-            { id: 'founderLinkedIn', label: 'LinkedIn Profile', type: 'url', col: 'col-md-6', placeholder: 'https://linkedin.com/in/...' }
-        ];
-
-        const formConfig = {
-            'college': [
-                {
-                    title: 'Founder Information', fields: [...commonCore,
-                    { id: 'collegeName', label: 'College / University *', type: 'text', col: 'col-md-8', required: true },
-                    { id: 'gradYear', label: 'Graduation Year', type: 'text', col: 'col-md-4' }
-                    ]
-                },
-                {
-                    title: 'Idea Details', fields: [
-                        { id: 'ideaName', label: 'Idea Name *', type: 'text', col: 'col-12', required: true },
-                        { id: 'ideaSummary', label: 'Idea Summary (Problem &amp; Solution) *', type: 'textarea', col: 'col-12', required: true, rows: 4 },
-                        { id: 'pitchDeck', label: 'Pitch Deck / Profile (Upload PDF)', type: 'file', accept: '.pdf,.jpg,.jpeg', col: 'col-12', note: 'Max file size 500KB. Alternatively, provide a Drive/Notion link within Idea Summary.' }
-                    ]
-                }
-            ],
-            'employed': [
-                {
-                    title: 'Founder Information', fields: [...commonCore,
-                    { id: 'currentRole', label: 'Current Role &amp; Employer *', type: 'text', col: 'col-12', required: true }
-                    ]
-                },
-                {
-                    title: 'Venture Details', fields: [
-                        { id: 'ideaName', label: 'Idea Name *', type: 'text', col: 'col-12', required: true },
-                        { id: 'ideaSummary', label: 'Idea Summary *', type: 'textarea', col: 'col-12', required: true, rows: 3 },
-                        { id: 'whyUs', label: 'Why do you need us to build/run it? *', type: 'textarea', col: 'col-12', required: true, rows: 3 },
-                        { id: 'domainExpertiseUrl', label: 'Proof of Domain Expertise (LinkedIn/Drive Link)', type: 'url', col: 'col-12' }
-                    ]
-                }
-            ],
-            'mvp': [
-                { title: 'Founder Information', fields: commonCore },
-                {
-                    title: 'Traction &amp; Funding', fields: [
-                        { id: 'ventureName', label: 'Venture Name *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'mvpLink', label: 'MVP Link / Demo URL *', type: 'url', col: 'col-md-6', required: true },
-                        { id: 'fundingAsk', label: 'Seed Funding Ask *', type: 'text', col: 'col-md-6', required: true, placeholder: '₹ ...' },
-                        { id: 'traction', label: 'Current Traction (Users/Revenue)', type: 'textarea', col: 'col-12', rows: 3 },
-                        { id: 'businessPlanFile', label: 'Business Plan / Pitch Deck (Upload PDF)', type: 'file', accept: '.pdf', col: 'col-12', note: 'Max 500KB' }
-                    ]
-                }
-            ],
-            'revenue': [
-                { title: 'Founder Information', fields: commonCore },
-                {
-                    title: 'Metrics &amp; Capital', fields: [
-                        { id: 'productName', label: 'Product Name *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'productUrl', label: 'Product URL *', type: 'url', col: 'col-md-6', required: true },
-                        { id: 'arr', label: 'Current ARR *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'vcAsk', label: 'VC Funding Ask *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'capTableLink', label: 'CAP Table / Financials (Drive Link)', type: 'url', col: 'col-12' },
-                        { id: 'pitchDeckFile', label: 'Pitch Deck (Upload PDF)', type: 'file', accept: '.pdf', col: 'col-12', note: 'Max 500KB' }
-                    ]
-                }
-            ],
-            'sell': [
-                { title: 'Your Information', fields: commonCore },
-                {
-                    title: 'Business Details', fields: [
-                        { id: 'businessName', label: 'Business Name *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'yearsActive', label: 'Years in Operation *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'annualRev', label: 'Annual Revenue *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'askingPrice', label: 'Asking Price / Valuation *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'whySelling', label: 'Reason for Selling *', type: 'textarea', col: 'col-12', required: true, rows: 3 },
-                        { id: 'plFile', label: 'P&amp;L Statement (Upload PDF)', type: 'file', accept: '.pdf', col: 'col-12', note: 'Max 500KB' }
-                    ]
-                }
-            ],
-            'ipo': [
-                { title: 'Executive Information', fields: commonCore },
-                {
-                    title: 'Company Details', fields: [
-                        { id: 'companyName', label: 'Company Name *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'targetExchange', label: 'Target Exchange (BSE/NSE/Etc) *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'lastRev', label: 'Last Year Revenue *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'auditor', label: 'Current Auditor / Firm', type: 'text', col: 'col-md-6' },
-                        { id: 'financialsLink', label: 'Audited Financials (Drive Link) *', type: 'url', col: 'col-12', required: true }
-                    ]
-                }
-            ],
-            'test': [
-                { title: 'Founder Information', fields: commonCore },
-                {
-                    title: 'Testing Requirements', fields: [
-                        { id: 'ideaSummary', label: 'Idea to Validate *', type: 'textarea', col: 'col-12', required: true, rows: 3 },
-                        { id: 'targetAudience', label: 'Target Audience *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'testBudget', label: 'Test Budget (Out of Pocket)', type: 'text', col: 'col-md-6' },
-                        { id: 'mockupFile', label: 'Mockups / Designs (Upload JPG/PDF)', type: 'file', accept: '.jpg,.jpeg,.png,.pdf', col: 'col-12', note: 'Max 500KB' }
-                    ]
-                }
-            ],
-            'valuation': [
-                { title: 'Founder Information', fields: commonCore },
-                {
-                    title: 'Valuation Context', fields: [
-                        { id: 'businessName', label: 'Business Name *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'industry', label: 'Industry *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'avgRevenue', label: 'Avg 3-Year Revenue *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'valuationReason', label: 'Reason for Valuation (M&amp;A, Funding, Internal) *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'financialsFile', label: 'Financial Summary (Upload PDF)', type: 'file', accept: '.pdf', col: 'col-12', note: 'Max 500KB' }
-                    ]
-                }
-            ],
-            'domestic_int': [
-                { title: 'Corporate Information', fields: commonCore },
-                {
-                    title: 'Expansion Goals', fields: [
-                        { id: 'companyName', label: 'Company Name *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'productCategory', label: 'Product Category *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'currentGeo', label: 'Current Domestic Footprint *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'targetGeo', label: 'Target International Markets *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'website', label: 'Company Website *', type: 'url', col: 'col-12', required: true },
-                        { id: 'profileFile', label: 'Company Profile (Upload PDF)', type: 'file', accept: '.pdf', col: 'col-12', note: 'Max 500KB' }
-                    ]
-                }
-            ],
-            'int_domestic': [
-                { title: 'Corporate Information', fields: commonCore },
-                {
-                    title: 'India Entry Goals', fields: [
-                        { id: 'companyName', label: 'Company Name *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'originCountry', label: 'Country of Origin *', type: 'text', col: 'col-md-6', required: true },
-                        { id: 'indiaTarget', label: 'India Target Market Segment *', type: 'text', col: 'col-12', required: true },
-                        { id: 'collabModel', label: 'Preferred Collaboration Model (JV, Reseller, Tech Transfer) *', type: 'text', col: 'col-12', required: true },
-                        { id: 'website', label: 'Company Website *', type: 'url', col: 'col-12', required: true },
-                        { id: 'profileFile', label: 'Company Profile (Upload PDF)', type: 'file', accept: '.pdf', col: 'col-12', note: 'Max 500KB' }
-                    ]
-                }
-            ]
-        };
-
-        const selector = document.getElementById('profileSelector');
-        const formContainer = document.getElementById('dynamicFormFields');
-        const theForm = document.getElementById('dynamicForm');
-        let fileDataMap = {};
-
-        selector.addEventListener('change', (e) => {
-            const profile = e.target.value;
-            if (!profile || !formConfig[profile]) return;
-
-            theForm.style.display = 'block';
-            fileDataMap = {};
-
-            let html = '';
-            formConfig[profile].forEach(group => {
-                html += `<div class="form-group-label">${group.title}</div><div class="row g-4 mb-4">`;
-                group.fields.forEach(f => {
-                    html += `<div class="${f.col}"><label class="form-label">${f.label}</label>`;
-                    if (f.type === 'textarea') {
-                        html += `<textarea id="${f.id}" class="form-control" rows="${f.rows || 3}" ${f.placeholder ? `placeholder="${f.placeholder}"` : ''} ${f.required ? 'required' : ''}></textarea>`;
-                    } else if (f.type === 'file') {
-                        html += `<input type="file" id="${f.id}" class="form-control" accept="${f.accept || ''}" ${f.required ? 'required' : ''}>`;
-                        if (f.note) html += `<small class="text-muted d-block mt-1" style="font-size:0.75rem;">${f.note}</small>`;
-                    } else {
-                        html += `<input type="${f.type}" id="${f.id}" class="form-control" ${f.placeholder ? `placeholder="${f.placeholder}"` : ''} ${f.required ? 'required' : ''}>`;
-                    }
-                    html += `</div>`;
-                });
-                html += `</div>`;
-            });
-
-            html += `<div class="row g-4 mt-2 mb-4"><div class="col-12"><div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="govCheck" required>
-                        <label class="form-check-label" for="govCheck">I confirm that all information provided is accurate and I understand Ideacubator operates with defined governance structures.</label>
-                     </div></div></div>`;
-
-            formContainer.innerHTML = html;
-
-            formContainer.querySelectorAll('input[type=file]').forEach(fileInput => {
-                fileInput.addEventListener('change', function (evt) {
-                    const file = evt.target.files[0];
-                    if (!file) { delete fileDataMap[fileInput.id]; return; }
-                    if (file.size > 700 * 1024) {
-                        alert(`File is too large (${(file.size / 1024).toFixed(1)}KB). Please keep it under 700KB or provide a Cloud URL link instead.`);
-                        evt.target.value = '';
-                        delete fileDataMap[fileInput.id];
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        fileDataMap[fileInput.id] = { name: file.name, type: file.type, data: e.target.result };
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
-        });
-
-        async function handleSubmit(e) {
-            e.preventDefault();
-            const form = e.target;
-            const btn = form.querySelector('.v-btn-submit');
-            btn.disabled = true;
-            btn.innerHTML = 'Submitting…';
-
-            const profile = selector.value;
-            const application = {
-                profileSelected: profile,
-                submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'new',
-                source: 'ideacubator.in'
-            };
-
-            const inputs = formContainer.querySelectorAll('input, select, textarea');
-            inputs.forEach(el => {
-                if (el.type === 'file') {
-                    if (fileDataMap[el.id]) application[el.id] = fileDataMap[el.id];
-                } else if (el.type === 'checkbox') {
-                    application[el.id] = el.checked;
-                } else {
-                    if (el.value.trim() !== '') application[el.id] = el.value.trim();
-                }
-            });
-
-            try {
-                await db.collection('applications').add(application);
-                form.style.display = 'none';
-                selector.parentElement.style.display = 'none';
-                document.querySelector('.form-section .section-desc').style.display = 'none';
-
-                const success = document.getElementById('form-success');
-                success.style.display = 'block';
-                window.scrollTo({ top: success.offsetTop - 120, behavior: 'smooth' });
-            } catch (err) {
-                console.error('Firebase write failed:', err);
-                btn.disabled = false;
-                btn.innerHTML = 'Submit Application <i class="bi bi-arrow-right ms-2"></i>';
-                alert('Submission failed. Your file might be too large, or network issues occurred. Please try again.');
-            }
-        }
-
-        // ─────────────────────────────────────────────────────────
-        AOS.init({ duration: 650, easing: 'ease-out-quad', once: true });
-
-        document.querySelectorAll('a[href^="#"]').forEach(a => {
-            a.addEventListener('click', e => {
-                const t = document.querySelector(a.getAttribute('href'));
-                if (t) { e.preventDefault(); window.scrollTo({ top: t.offsetTop - 80, behavior: 'smooth' }); }
-            });
-        });
-    </script>
+    <script src="assets/js/main.js"></script>
 </body>
 
 </html>
