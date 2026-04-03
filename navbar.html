@@ -1,0 +1,49 @@
+<!-- NAVBAR -->
+<nav class="nav navbar navbar-expand-lg">
+    <div class="container-fluid px-3">
+        <a href="../index.html" class="nav__brand" data-route="home">
+            <img src="../assets/logo.png" alt="Ideacubator" height="44">
+            <span class="nav__brand-text">Ideacubator</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="nav__links navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a href="#who-we-are" class="nav-link">Who We Are</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#models" class="nav-link">Engagement Models</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#deal-flow-process" class="nav-link">Deal Flow Process</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#focus" class="nav-link">Focus Areas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#our-studio" class="nav-link">Our Studio</a>
+                </li>
+            </ul>
+
+            <div class="nav__actions d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
+                <a href="dashboard/founder.html" class="nav__dashboard-link" style="display: none;">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <button type="button" class="nav__cta" id="loginBtn" data-bs-toggle="modal"
+                    data-bs-target="#loginModal">
+                    Dashboard
+                </button>
+                <button type="button" class="nav__cta nav__logout" style="display: none;" id="logoutBtn">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>

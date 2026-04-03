@@ -15,40 +15,28 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link href="assets/css/index.css" rel="stylesheet">
+    <link href="ideacubator.css" rel="stylesheet">
+
+    <!-- Load shared navbar -->
+    <script>
+        // Fetch and inject navbar
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+            })
+            .catch(err => console.error('Failed to load navbar:', err));
+    </script>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="nav">
-        <a href="index.html" class="nav__brand">
-            <img src="assets/img/logo.png" alt="Ideacubator" height="44">
-            <span class="nav__brand-text">Ideacubator</span>
-        </a>
-        <ul class="nav__links">
-            <li><a href="#philosophy">Philosophy</a></li>
-            <li><a href="#models">Models</a></li>
-            <li><a href="#focus">Focus Areas</a></li>
-            <li><a href="#process">Process</a></li>
-            <li><a href="#capital">Capital</a></li>
-            <li><a href="#apply">Apply</a></li>
-        </ul>
-        <div class="nav__actions">
-            <a href="dashboard/founder.html" class="nav__dashboard-link" style="display: none;">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-            <button type="button" class="nav__cta" id="loginBtn" data-bs-toggle="modal" data-bs-target="#loginModal">
-                Login
-            </button>
-            <button type="button" class="nav__cta nav__logout" style="display: none;" id="logoutBtn">
-                Logout
-            </button>
-        </div>
-    </nav>
+    <!-- NAVBAR CONTAINER -->
+    <div id="navbar-container"></div>
 
     <!-- Login Modal -->
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true"
+        data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
@@ -75,11 +63,29 @@
                 <div class="col-lg-10 text-center" data-aos="fade-up" data-aos-duration="800">
                     <span class="hero__badge"><i class="bi bi-stars"></i> Venture Capital & Studio</span>
                     <h1 class="hero__title">Capital. Structure. Execution.</h1>
-                    <p class="hero__subtitle">We partner with ambitious founders through flexible investment and venture-building models.</p>
+                    <p class="hero__subtitle">We partner with ambitious founders through flexible investment and
+                        venture-building models.</p>
                     <div class="hero__ctas">
-                        <a href="#apply" class="btn btn--primary">Have an Idea? Apply Now</a>
-                        <a href="invest.html" class="btn btn--outline">Want to Invest? Register</a>
-                        <button type="button" class="btn btn--outline" data-bs-toggle="modal" data-bs-target="#loginModal">Founder/Investor Login</button>
+                        <div class="hero-cta-item">
+                            <div class="hero-cta-label">Have an idea you want to turn into a company?</div>
+                            <a href="#apply" class="btn btn--primary btn-lg">
+                                <span class="arrow-icon">→</span> Build With Us
+                            </a>
+                        </div>
+
+                        <div class="hero-cta-item">
+                            <div class="hero-cta-label">Looking to invest in high-potential startups?</div>
+                            <a href="invest.html" class="btn btn--primary btn-lg">
+                                <span class="arrow-icon">→</span> Invest With Us
+                            </a>
+                        </div>
+
+                        <div class="hero-cta-item">
+                            <div class="hero-cta-label">Already applied or invested?</div>
+                            <button type="button" class="btn btn--primary btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                <span class="arrow-icon">→</span> Track My Application
+                            </button>
+                        </div>
                     </div>
                     <div class="hero__stats">
                         <div class="hero__stat">
@@ -100,16 +106,16 @@
         </div>
     </section>
 
-    <!-- PHILOSOPHY -->
-    <section class="section section--philosophy" id="philosophy">
+    <!-- WHO WE ARE (formerly Philosophy) -->
+    <section class="section section--philosophy" id="who-we-are">
         <div class="container">
             <div class="row gy-5">
                 <div class="col-lg-5" data-aos="fade-right">
-                    <span class="section__label">Our Philosophy</span>
-                    <h2 class="section__title">Structure is not a constraint.<br>It is the foundation of durability.</h2>
-                    <p class="section__desc">We believe strong ideas require structure. Capital alone is not enough.
-                        Execution discipline — applied consistently and early — is what separates ventures that last
-                        from those that don't.</p>
+                    <span class="section__label">Who We Are</span>
+                    <h2 class="section__title">Ideacubator: Venture Studio & Deal Flow Platform</h2>
+                    <p class="section__desc">Ideacubator is a venture studio and deal-flow platform that supports
+                        startups from Idea → Validation → Build → Funding → Exit.
+                        We partner with ambitious founders through flexible investment and venture-building models.</p>
                 </div>
                 <div class="col-lg-7">
                     <div class="card-grid card-grid--2col" data-aos="fade-up" data-aos-delay="100">
@@ -149,7 +155,8 @@
             <div class="section section--centered" data-aos="fade-up">
                 <span class="section__label">Engagement Models</span>
                 <h2 class="section__title">Four Ways to Partner</h2>
-                <p class="section__desc">Each model is designed for a specific founder profile, stage, and ambition level.</p>
+                <p class="section__desc">Each model is designed for a specific founder profile, stage, and ambition
+                    level.</p>
             </div>
             <div class="card-grid card-grid--4col" data-aos="fade-up" data-aos-delay="100">
                 <!-- Model A -->
@@ -163,7 +170,8 @@
                         <li>Quarterly review cadence with defined KPIs</li>
                         <li>No board seat unless mutually agreed post-Series A</li>
                     </ul>
-                    <div class="card__footer"><i class="bi bi-shield-check"></i> Diligence-first. Capital follows conviction.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> Diligence-first. Capital follows
+                        conviction.</div>
                 </div>
 
                 <!-- Model B -->
@@ -177,7 +185,8 @@
                         <li>Monthly operational review, quarterly board review</li>
                         <li>Network access, hiring support, and market entry guidance</li>
                     </ul>
-                    <div class="card__footer"><i class="bi bi-shield-check"></i> Partnership with accountability at every stage.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> Partnership with accountability at
+                        every stage.</div>
                 </div>
 
                 <!-- Model C -->
@@ -191,7 +200,8 @@
                         <li>Sprint-based delivery with joint review every two weeks</li>
                         <li>IP ownership clearly defined in partnership agreement</li>
                     </ul>
-                    <div class="card__footer"><i class="bi bi-shield-check"></i> You bring the vision. We bring the execution engine.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> You bring the vision. We bring the
+                        execution engine.</div>
                 </div>
 
                 <!-- Model D -->
@@ -205,7 +215,8 @@
                         <li>Investment decision made transparently post-validation</li>
                         <li>Full investment available if validation criteria are met</li>
                     </ul>
-                    <div class="card__footer"><i class="bi bi-shield-check"></i> Conviction built on evidence, not optimism.</div>
+                    <div class="card__footer"><i class="bi bi-shield-check"></i> Conviction built on evidence, not
+                        optimism.</div>
                 </div>
             </div>
         </div>
@@ -217,7 +228,8 @@
             <div class="section section--centered" data-aos="fade-up">
                 <span class="section__label">What We Look For</span>
                 <h2 class="section__title">We evaluate both the idea and the founder.</h2>
-                <p class="section__desc">Strong ideas submitted by weak founders rarely succeed. Exceptional founders in average markets frequently do.</p>
+                <p class="section__desc">Strong ideas submitted by weak founders rarely succeed. Exceptional founders in
+                    average markets frequently do.</p>
             </div>
             <div class="card-grid card-grid--auto" data-aos="fade-up" data-aos-delay="100">
                 <div class="card">
@@ -231,7 +243,7 @@
                     <p>Do you understand the problem at a structural level — not just surface symptoms?</p>
                 </div>
                 <div class="card">
-                    <div class="card__icon"><i class="bi bi-handshake"></i></div>
+                    <div class="card__icon"><i class="bi bi-shield-check"></i></div>
                     <h4>Integrity</h4>
                     <p>We conduct reference checks. We value founders who disclose risks openly.</p>
                 </div>
@@ -266,19 +278,22 @@
                 <div class="col-lg-5" data-aos="fade-right">
                     <span class="section__label">Investment Focus</span>
                     <h2 class="section__title">Where We Deploy Capital</h2>
-                    <p class="section__desc">We invest where technology creates structural advantage — not just efficiency.</p>
+                    <p class="section__desc">We invest where technology creates structural advantage — not just
+                        efficiency.</p>
                 </div>
                 <div class="col-lg-7" data-aos="fade-left" data-aos-delay="100">
                     <div class="card-grid card-grid--3col">
                         <div class="card">
                             <div class="card__icon"><i class="bi bi-cpu-fill"></i></div>
                             <h4>AI-Enabled Platforms</h4>
-                            <p>Products where AI is a core architectural layer — not a feature added to an existing solution.</p>
+                            <p>Products where AI is a core architectural layer — not a feature added to an existing
+                                solution.</p>
                         </div>
                         <div class="card">
                             <div class="card__icon"><i class="bi bi-building"></i></div>
                             <h4>B2B SaaS</h4>
-                            <p>Vertical SaaS targeting underserved enterprise workflows, particularly in regulated industries.</p>
+                            <p>Vertical SaaS targeting underserved enterprise workflows, particularly in regulated
+                                industries.</p>
                         </div>
                         <div class="card">
                             <div class="card__icon"><i class="bi bi-braces-asterisk"></i></div>
@@ -293,12 +308,14 @@
                         <div class="card">
                             <div class="card__icon"><i class="bi bi-server"></i></div>
                             <h4>Scalable Infrastructure</h4>
-                            <p>Foundational platforms that enable other businesses to operate — data pipelines, API ecosystems.</p>
+                            <p>Foundational platforms that enable other businesses to operate — data pipelines, API
+                                ecosystems.</p>
                         </div>
                         <div class="card">
                             <div class="card__icon"><i class="bi bi-globe-americas"></i></div>
                             <h4>High-Impact Markets</h4>
-                            <p>India-origin businesses with global reach potential, and global businesses targeting India.</p>
+                            <p>India-origin businesses with global reach potential, and global businesses targeting
+                                India.</p>
                         </div>
                     </div>
                 </div>
@@ -306,92 +323,424 @@
         </div>
     </section>
 
-    <!-- EVALUATION PROCESS -->
-    <section class="section section--process" id="process">
+    <!-- DEAL FLOW PROCESS -->
+    <section class="section section--process" id="deal-flow-process">
         <div class="container">
-            <div class="section section--centered" data-aos="fade-up">
-                <span class="section__label">Evaluation Process</span>
-                <h2 class="section__title">Structured. Transparent. Rigorous.</h2>
-                <p class="section__desc">Our process reaches a clear decision within a defined timeframe.</p>
+            <div class="row mb-5">
+                <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
+                    <span class="section__label">Deal Flow Process</span>
+                    <h2 class="section__title mb-4">How We Evaluate & Partner</h2>
+                    <p class="section__desc fs-5">Our process reaches a clear decision within a defined timeframe.
+                        Transparency and speed are commitments—not bonuses.</p>
+                </div>
             </div>
-            <div class="card-grid card-grid--2col" data-aos="fade-up" data-aos-delay="100">
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-file-earmark-check-fill"></i></div>
-                    <h5>01 · Application Review</h5>
-                    <p>Every application reviewed within 14 business days. You will receive a response regardless of outcome.</p>
+
+            <div class="row mb-5">
+                <div class="col-12" data-aos="fade-up">
+                    <div class="process-timeline">
+                        <div class="process-step d-flex mb-4">
+                            <div class="step-number me-4">01</div>
+                            <div class="step-content flex-grow-1">
+                                <h3>Application Review</h3>
+                                <p>Every application reviewed within <strong>14 business days</strong>. You will receive
+                                    a response regardless of outcome.</p>
+                            </div>
+                        </div>
+                        <div class="process-step d-flex mb-4">
+                            <div class="step-number me-4">02</div>
+                            <div class="step-content flex-grow-1">
+                                <h3>Screening Discussion</h3>
+                                <p>A <strong>45-minute structured conversation</strong>. We assess the founder
+                                    directly—not through the pitch deck.</p>
+                            </div>
+                        </div>
+                        <div class="process-step d-flex mb-4">
+                            <div class="step-number me-4">03</div>
+                            <div class="step-content flex-grow-1">
+                                <h3>Technical & Commercial Assessment</h3>
+                                <p>Product review, market analysis, financial model scrutiny, and reference
+                                    conversations.</p>
+                            </div>
+                        </div>
+                        <div class="process-step d-flex mb-4">
+                            <div class="step-number me-4">04</div>
+                            <div class="step-content flex-grow-1">
+                                <h3>Validation Sprint (Early Stage Only)</h3>
+                                <p>For early-stage applications: a structured <strong>8–12 week validation
+                                        sprint</strong> before committing capital.</p>
+                            </div>
+                        </div>
+                        <div class="process-step d-flex mb-4">
+                            <div class="step-number me-4">05</div>
+                            <div class="step-content flex-grow-1">
+                                <h3>Investment Committee</h3>
+                                <p>Decision communicated within <strong>5 business days</strong> of committee
+                                    meeting—with clear rationale.</p>
+                            </div>
+                        </div>
+                        <div class="process-step d-flex mb-4">
+                            <div class="step-number me-4">06</div>
+                            <div class="step-content flex-grow-1">
+                                <h3>Structured Onboarding</h3>
+                                <p>A <strong>4-week onboarding</strong>—governance setup, reporting cadence, milestone
+                                    documentation, team integration.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-chat-dots-fill"></i></div>
-                    <h5>02 · Screening Discussion</h5>
-                    <p>A 45-minute structured conversation. We assess the founder directly — not through the pitch deck.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-graph-up-arrow"></i></div>
-                    <h5>03 · Technical & Commercial Assessment</h5>
-                    <p>Product review, market analysis, financial model scrutiny, and reference conversations.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-flask-fill"></i></div>
-                    <h5>04 · Validation Sprint</h5>
-                    <p>For early-stage applications: a structured 8–12 week validation sprint before committing capital.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-bank2"></i></div>
-                    <h5>05 · Investment Committee</h5>
-                    <p>Decision communicated within 5 business days of committee meeting — with clear rationale.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
-                    <h5>06 · Structured Onboarding</h5>
-                    <p>4-week onboarding — governance setup, reporting cadence, milestone documentation, team integration.</p>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-12" data-aos="fade-up">
+                    <h2 class="h3 text-center mb-4">Application Status Pipeline</h2>
+                    <div class="pipeline-flow">
+                        <div class="pipeline-stage">
+                            <div class="stage-icon"><i class="bi bi-send"></i></div>
+                            <div class="stage-name">Submitted</div>
+                        </div>
+                        <div class="pipeline-arrow"><i class="bi bi-arrow-right-short"></i></div>
+                        <div class="pipeline-stage">
+                            <div class="stage-icon"><i class="bi bi-eye"></i></div>
+                            <div class="stage-name">Under Review</div>
+                        </div>
+                        <div class="pipeline-arrow"><i class="bi bi-arrow-right-short"></i></div>
+                        <div class="pipeline-stage">
+                            <div class="stage-icon"><i class="bi bi-calendar-event"></i></div>
+                            <div class="stage-name">Meeting Scheduled</div>
+                        </div>
+                        <div class="pipeline-arrow"><i class="bi bi-arrow-right-short"></i></div>
+                        <div class="pipeline-stage">
+                            <div class="stage-icon"><i class="bi bi-clipboard-check"></i></div>
+                            <div class="stage-name">Due Diligence</div>
+                        </div>
+                        <div class="pipeline-arrow"><i class="bi bi-arrow-right-short"></i></div>
+                        <div class="pipeline-stage">
+                            <div class="stage-icon"><i class="bi bi-check-circle"></i></div>
+                            <div class="stage-name">Approved</div>
+                        </div>
+                        <div class="pipeline-arrow"><i class="bi bi-arrow-right-short"></i></div>
+                        <div class="pipeline-stage">
+                            <div class="stage-icon"><i class="bi bi-building"></i></div>
+                            <div class="stage-name">Incubation</div>
+                        </div>
+                        <div class="pipeline-arrow"><i class="bi bi-arrow-right-short"></i></div>
+                        <div class="pipeline-stage">
+                            <div class="stage-icon"><i class="bi bi-rocket-takeoff"></i></div>
+                            <div class="stage-name">Active Portfolio</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CAPITAL DEPLOYMENT -->
-    <section class="section section--capital" id="capital">
+    <style>
+        .process-timeline {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .process-step {
+            padding: 1.5rem;
+            background: var(--bg-elevated);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .step-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: var(--font-heading);
+        }
+
+        .step-content h3 {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .pipeline-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 2rem;
+            background: var(--bg-elevated);
+            border-radius: var(--radius);
+        }
+
+        .pipeline-stage {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-width: 120px;
+        }
+
+        .stage-icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stage-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .pipeline-flow {
+                flex-direction: column;
+            }
+
+            .pipeline-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+
+    <!-- OUR STUDIO -->
+    <section class="section section--studio" id="our-studio">
         <div class="container">
-            <div class="section section--centered" data-aos="fade-up">
-                <span class="section__label">Capital Deployment</span>
-                <h2 class="section__title">Discipline is not control.</h2>
-                <p class="section__desc">Our framework protects the health of the venture — not to restrict the founder.</p>
-            </div>
-            <div class="card-grid card-grid--flex" data-aos="fade-up" data-aos-delay="100">
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-layers-fill"></i></div>
-                    <h4>Milestone-Based Tranching</h4>
-                    <p>Capital deployed in structured tranches tied to agreed milestones — revenue, product, team, or market.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-person-lock-fill"></i></div>
-                    <h4>Founder Vesting</h4>
-                    <p>Founder vesting schedules agreed upfront — protecting both the founder's stake and venture stability.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-diagram-2-fill"></i></div>
-                    <h4>Governance Clarity</h4>
-                    <p>Voting rights, board composition, and exit provisions defined in plain language before investment.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-clock-history"></i></div>
-                    <h4>Long-Term Alignment</h4>
-                    <p>We invest for meaningful time horizons. Not optimizing for quick exits.</p>
+            <div class="row mb-5">
+                <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
+                    <span class="section__label">Our Studio</span>
+                    <h2 class="section__title mb-4">Building Companies With Founders</h2>
+                    <p class="section__desc fs-5">A venture studio is more than a fund—it's a company builder. We don't
+                        just write checks; we co-build ventures with founders from the ground up.</p>
                 </div>
             </div>
-            <div class="card-grid card-grid--flex mt-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-bar-chart-fill"></i></div>
-                    <h4>Reporting Expectations</h4>
-                    <p>Monthly operational update. Quarterly financial review. No surprises policy.</p>
+
+            <div class="row mb-5">
+                <div class="col-lg-6 mb-4" data-aos="fade-right">
+                    <h3 class="h4 mb-3">What is a Venture Studio?</h3>
+                    <p>Unlike traditional venture capital that only provides capital, a venture studio actively
+                        participates in company creation. We provide the team, infrastructure, processes, and execution
+                        expertise that most founders lack.</p>
+                    <p>The studio model works like this:</p>
+                    <ul class="mt-3">
+                        <li><strong>Idea Stage:</strong> We work with you to validate and refine business ideas</li>
+                        <li><strong>Build Phase:</strong> Our internal engineering team executes the build</li>
+                        <li><strong>Launch:</strong> We support market entry, GTM, and early customer acquisition</li>
+                        <li><strong>Scale:</strong> Studio remains involved through Series Seed/A</li>
+                    </ul>
                 </div>
-                <div class="card">
-                    <div class="card__icon"><i class="bi bi-shield-fill-check"></i></div>
-                    <h4>Founder Protections</h4>
-                    <p>Anti-dilution, co-sale rights, and reasonable founder protections standard in our term sheets.</p>
+                <div class="col-lg-6 mb-4" data-aos="fade-left">
+                    <div class="card h-100 bg-elevated">
+                        <div class="card-body">
+                            <h4 class="mb-3">Studio vs Traditional VC</h4>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-muted">Capital</td>
+                                            <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Product Team</td>
+                                            <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Technical Infrastructure</td>
+                                            <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Go-to-Market Support</td>
+                                            <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Hiring & Talent Network</td>
+                                            <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Governance & Reporting</td>
+                                            <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-12 mb-4" data-aos="fade-up">
+                    <h2 class="h3 text-center mb-4">Studio Support</h2>
+                </div>
+                <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-code-slash fs-3 text-accent me-3"></i>
+                                <div>
+                                    <h5 class="mb-1 text-white">Technical Excellence</h5>
+                                    <p class="small mb-0 text-light">Modern stack, AI-augmented development,
+                                        scalability-first architecture</p>
+                                </div>
+                            </div>
+                            <ul class="small mt-3 text-light">
+                                <li>React/Vue frontends, Node.js/Python backends</li>
+                                <li>Cloud-native (AWS/GCP) with infrastructure-as-code</li>
+                                <li>CI/CD pipelines from day one</li>
+                                <li>Security and compliance built-in</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-bullseye fs-3 text-accent me-3"></i>
+                                <div>
+                                    <h5 class="mb-1 text-white">Product Management</h5>
+                                    <p class="small mb-0 text-light">Experienced product leaders who've shipped at scale
+                                    </p>
+                                </div>
+                            </div>
+                            <ul class="small mt-3 text-light">
+                                <li>Dual-track agile (discovery + delivery)</li>
+                                <li>User research and usability testing</li>
+                                <li>Roadmapping with OKR alignment</li>
+                                <li>Analytics and data-driven decisions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-cash-stack fs-3 text-accent me-3"></i>
+                                <div>
+                                    <h5 class="mb-1 text-white">Funding Access</h5>
+                                    <p class="small mb-0 text-light">From initial capital to Series A and beyond</p>
+                                </div>
+                            </div>
+                            <ul class="small mt-3 text-light">
+                                <li>Initial capital for MVP build</li>
+                                <li>Seed round coordination</li>
+                                <li>Investor network across India, US, SEA</li>
+                                <li>Fundraising strategy and materials</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-people fs-3 text-accent me-3"></i>
+                                <div>
+                                    <h5 class="mb-1 text-white">Hiring & Talent</h5>
+                                    <p class="small mb-0 text-light">Access to curated talent network and recruiting
+                                        support</p>
+                                </div>
+                            </div>
+                            <ul class="small mt-3 text-light">
+                                <li>Technical recruiting for early team</li>
+                                <li>Network of fractional execs (CTO, CFO, CMO)</li>
+                                <li>Employer branding and EVP</li>
+                                <li>HR and payroll infrastructure</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Office/Workspace Gallery -->
+            <div class="row mb-5">
+                <div class="col-12 mb-4" data-aos="fade-up">
+                    <h2 class="h3 text-center mb-4">Our Workspace</h2>
+                </div>
+                <div class="col-12" data-aos="fade-up">
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <img src="assets/bangalore_office_(1).webp" alt="Ideacubator Office - Main Workspace"
+                                class="img-fluid rounded shadow w-100">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <img src="assets/bangalore-Kadubeesanhalli.png" alt="Ideacubator Office - Meeting Area"
+                                class="img-fluid rounded shadow w-100">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </section>
+
+    <style>
+        .stage-number {
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+    </style>
+    <div class="container">
+        <div class="section section--centered" data-aos="fade-up">
+            <span class="section__label">Capital Deployment</span>
+            <h2 class="section__title">Discipline is not control.</h2>
+            <p class="section__desc">Our framework protects the health of the venture — not to restrict the founder.</p>
+        </div>
+        <div class="card-grid card-grid--flex" data-aos="fade-up" data-aos-delay="100">
+            <div class="card">
+                <div class="card__icon"><i class="bi bi-layers-fill"></i></div>
+                <h4>Milestone-Based Tranching</h4>
+                <p>Capital deployed in structured tranches tied to agreed milestones — revenue, product, team, or
+                    market.</p>
+            </div>
+            <div class="card">
+                <div class="card__icon"><i class="bi bi-person-lock-fill"></i></div>
+                <h4>Founder Vesting</h4>
+                <p>Founder vesting schedules agreed upfront — protecting both the founder's stake and venture stability.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card__icon"><i class="bi bi-diagram-2-fill"></i></div>
+                <h4>Governance Clarity</h4>
+                <p>Voting rights, board composition, and exit provisions defined in plain language before investment.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card__icon"><i class="bi bi-clock-history"></i></div>
+                <h4>Long-Term Alignment</h4>
+                <p>We invest for meaningful time horizons. Not optimizing for quick exits.</p>
+            </div>
+        </div>
+        <div class="card-grid card-grid--flex mt-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="card">
+                <div class="card__icon"><i class="bi bi-bar-chart-fill"></i></div>
+                <h4>Reporting Expectations</h4>
+                <p>Monthly operational update. Quarterly financial review. No surprises policy.</p>
+            </div>
+            <div class="card">
+                <div class="card__icon"><i class="bi bi-shield-fill-check"></i></div>
+                <h4>Founder Protections</h4>
+                <p>Anti-dilution, co-sale rights, and reasonable founder protections standard in our term sheets.</p>
+            </div>
+        </div>
+    </div>
     </section>
 
     <!-- APPLICATION FORM -->
@@ -415,21 +764,25 @@
                         <option value="test">7. Market Test an Idea before a Big Launch</option>
                         <option value="valuation">8. Need to Value my Business</option>
                         <option value="domestic_int">9. Domestic Business seeking International Sales Partner</option>
-                        <option value="int_domestic">10. International Business seeking Domestic (India) Sales Partner</option>
+                        <option value="int_domestic">10. International Business seeking Domestic (India) Sales Partner
+                        </option>
                     </select>
                 </div>
 
                 <form id="dynamicForm" class="form__dynamic" style="display:none;">
                     <div id="dynamicFormFields"></div>
                     <div class="form__actions mt-5">
-                        <button type="submit" class="btn btn--primary"><i class="bi bi-send-fill"></i> Submit Application</button>
-                        <p class="form__note">Applications are typically reviewed within 14 business days. You will receive a response regardless of outcome.</p>
+                        <button type="submit" class="btn btn--primary"><i class="bi bi-send-fill"></i> Submit
+                            Application</button>
+                        <p class="form__note">Applications are typically reviewed within 14 business days. You will
+                            receive a response regardless of outcome.</p>
                     </div>
                 </form>
 
                 <div id="form-success" class="form__success">
                     <h4>Application Received</h4>
-                    <p>Thank you. Your application has been submitted. We will review it and respond within 14 business days.</p>
+                    <p>Thank you. Your application has been submitted. We will review it and respond within 14 business
+                        days.</p>
                 </div>
             </div>
         </div>
@@ -437,7 +790,8 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-        <p>&copy; 2026 Ideacubator &nbsp;&middot;&nbsp; Bangalore, India &nbsp;&middot;&nbsp; <a href="https://ideacubator.in">ideacubator.in</a></p>
+        <p>&copy; 2026 Ideacubator &nbsp;&middot;&nbsp; Bangalore, India &nbsp;&middot;&nbsp; <a
+                href="https://ideacubator.in">ideacubator.in</a></p>
         <p class="footer__contact"><a href="mailto:hello@ideacubator.in">hello@ideacubator.in</a></p>
     </footer>
 
@@ -447,7 +801,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="ideacubator.js"></script>
 </body>
 
 </html>
