@@ -357,6 +357,11 @@ section {
     background: transparent;
 }
 
+/* Navbar user name - force light color */
+.nav__actions .text-muted {
+    color: var(--text-muted) !important;
+}
+
 /* ============================================================
    BUTTONS
    ============================================================ */
@@ -1080,4 +1085,207 @@ section {
     .section__title {
         font-size: clamp(1.5rem, 5vw, 2rem);
     }
+}
+
+/* ============================================================
+   MODAL STYLING - DARK THEME
+   ============================================================ */
+.modal-content {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-header .modal-title {
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    gap: 0.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    color: var(--text-muted);
+}
+
+.modal-body p,
+.modal-body small,
+.modal-body label,
+.modal-body .form-label,
+.modal-body .form-control,
+.modal-body .form-select,
+.modal-body .text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Ensure all modal content inherits light text */
+.modal-content {
+    color: var(--text-muted);
+}
+
+.modal-body .table {
+    color: var(--text-muted);
+}
+
+.modal-body .table th {
+    color: var(--text);
+    font-weight: 600;
+    border-top: none;
+}
+
+.modal-body .table td {
+    border-top: 1px solid var(--border);
+}
+
+.btn-close {
+    filter: invert(1);
+    opacity: 0.6;
+    transition: opacity var(--ease);
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+/* Index.html login modal specific */
+#loginModal .modal-content {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    max-width: 400px;
+    margin: 2rem auto;
+}
+
+/* Login Modal - compact and centered */
+#loginForm {
+    display: none; /* hidden by default, JS will set to flex */
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(10, 10, 11, 0.95);
+    z-index: 9999;
+}
+
+#loginForm .card {
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    width: 90%;
+    max-width: 420px; /* compact width */
+    border-radius: var(--radius);
+    flex-shrink: 0;
+}
+
+#loginForm .card-title {
+    font-family: var(--font-heading);
+    color: var(--text);
+    font-weight: 600;
+}
+
+#loginForm .form-control {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+}
+
+#loginForm .form-label {
+    color: var(--text-muted) !important;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+#loginForm .btn--primary {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Detail modal size - centered, not stretched */
+#appDetailModal .modal-dialog {
+    max-width: 700px;
+    width: 90%;
+    margin: 1.5rem auto;
+}
+
+@media (min-width: 768px) {
+    #appDetailModal .modal-dialog {
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 600px) {
+    #appDetailModal .modal-dialog {
+        width: 95%;
+        margin: 0.5rem auto;
+    }
+}
+
+/* ============================================================
+   ADMIN DASHBOARD STATS
+   ============================================================ */
+.stat-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--ease);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    border-color: var(--border-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.stat-card .number {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--text) 0%, var(--text-muted) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-card .label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Elevated/highlighted stat card */
+.stat-card--elevated {
+    background: linear-gradient(135deg, var(--bg-elevated) 0%, rgba(200, 163, 95, 0.08) 100%);
+    border: 2px solid var(--accent);
+    box-shadow: 0 8px 32px rgba(200, 163, 95, 0.25);
+}
+
+.stat-card--elevated .number {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.stat-card--elevated .label {
+    color: var(--accent);
 }
