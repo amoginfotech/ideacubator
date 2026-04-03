@@ -387,11 +387,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─────────────────────────────────────────────────────────
     AOS.init({ duration: 650, easing: 'ease-out-quad', once: true });
 
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-        a.addEventListener('click', e => {
-            const t = document.querySelector(a.getAttribute('href'));
-            if (t) { e.preventDefault(); window.scrollTo({ top: t.offsetTop - 80, behavior: 'smooth' }); }
-        });
+    // Use event delegation for smooth scrolling (works with dynamically loaded navbars)
+    document.addEventListener('click', e => {
+        const link = e.target.closest('a[href^="#"]');
+        if (!link) return;
+
+        const targetId = link.getAttribute('href');
+
+        // Skip if it's not a simple hash (like #apply on index.html which is a section ID)
+        // We want smooth scrolling ONLY on index.html page for its internal sections
+        // Check if we're on index.html (or any page that has these sections)
+        const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
+
+        if (isIndexPage && targetId.length > 1) {
+            const target = document.querySelector(targetId);
+            if (target) {
+                e.preventDefault();
+                window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+            }
+        }
+        // If not on index.html, let default behavior happen (links like #something won't work anyway)
     });
 
     // ─────────────────────────────────────────────────────────
