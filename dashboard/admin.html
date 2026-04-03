@@ -9,46 +9,10 @@
     <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="../ideacubator.css" rel="stylesheet">
-
-    <style>
-        .stat-card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .stat-card .number {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .stat-card .label {
-            font-size: .85rem;
-            color: var(--text-muted);
-        }
-
-        .table-dark {
-            --bs-table-bg: var(--bg-elevated);
-            --bs-table-border-color: var(--border);
-        }
-
-        .bg-info {
-            --bs-bg-opacity: 0.2;
-            background-color: #0dcaf0 !important;
-        }
-
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-    </style>
 </head>
 
 <body>
@@ -83,7 +47,7 @@
         <div id="navbar-container"></div>
 
         <!-- DASHBOARD CONTENT -->
-        <div class="container py-4">
+        <div class="container" style="padding-top: calc(var(--nav-h) + 1.5rem); padding-bottom: 2rem;">
             <div class="row">
                 <div class="col-12">
                     <h1 class="section__title mb-4">Admin Dashboard</h1>
@@ -97,7 +61,7 @@
                     <!-- Stats Row -->
                     <div class="row g-3 mb-4" id="statsRow" style="display: none;">
                         <div class="col-md-3">
-                            <div class="stat-card">
+                            <div class="stat-card stat-card--elevated">
                                 <div class="number" id="statApplications">0</div>
                                 <div class="label">Total Applications</div>
                             </div>
@@ -125,10 +89,12 @@
                     <!-- Tabs -->
                     <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist" style="display: none;">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications" type="button">Applications</button>
+                            <button class="nav-link active" id="applications-tab" data-bs-toggle="tab"
+                                data-bs-target="#applications" type="button">Applications</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="investors-tab" data-bs-toggle="tab" data-bs-target="#investors" type="button">Investor Inquiries</button>
+                            <button class="nav-link" id="investors-tab" data-bs-toggle="tab" data-bs-target="#investors"
+                                type="button">Investor Inquiries</button>
                         </li>
                     </ul>
 
@@ -138,6 +104,41 @@
                         <div class="tab-pane fade show active" id="applications" role="tabpanel">
                             <div class="card">
                                 <div class="card-body">
+                                    <!-- Filters -->
+                                    <div class="row g-2 mb-3" id="appFilters">
+                                        <div class="col-md-3">
+                                            <label class="form-label small text-muted">Status</label>
+                                            <select class="form-select form-select-sm" id="filterStatus">
+                                                <option value="all">All Statuses</option>
+                                                <option value="submitted">Submitted</option>
+                                                <option value="under_review">Under Review</option>
+                                                <option value="meeting_scheduled">Meeting Scheduled</option>
+                                                <option value="due_diligence">Due Diligence</option>
+                                                <option value="approved">Approved</option>
+                                                <option value="rejected">Rejected</option>
+                                                <option value="invested">Invested</option>
+                                                <option value="incubation">Incubation</option>
+                                                <option value="closed">Closed</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small text-muted">Rating</label>
+                                            <select class="form-select form-select-sm" id="filterRating">
+                                                <option value="all">All Ratings</option>
+                                                <option value="5">5 Stars</option>
+                                                <option value="4">4+ Stars</option>
+                                                <option value="3">3+ Stars</option>
+                                                <option value="2">2+ Stars</option>
+                                                <option value="1">1+ Stars</option>
+                                                <option value="0">No Rating</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 d-flex align-items-end">
+                                            <button class="btn btn--primary btn-sm" onclick="applyFilters()">Apply Filters</button>
+                                            <button class="btn btn--outline btn-sm ms-2" onclick="clearFilters()">Clear</button>
+                                        </div>
+                                    </div>
+
                                     <div class="table-responsive">
                                         <table class="table table-dark table-hover table-sm">
                                             <thead>
@@ -146,6 +147,7 @@
                                                     <th>Name</th>
                                                     <th>Email</th>
                                                     <th>Profile</th>
+                                                    <th>Rating</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -208,21 +210,6 @@
         </div>
     </div>
 
-    <style>
-        .application-details table {
-            margin-bottom: 1rem;
-        }
-        .application-details table td:first-child {
-            background: rgba(255,255,255,0.05);
-            border-right: 1px solid var(--border);
-        }
-        pre {
-            background: #1a1a1a !important;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-        }
-    </style>
-
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -273,6 +260,15 @@
             }
         });
 
+        // Auto logout when leaving admin page (navigate to index.html or other site)
+        window.addEventListener('beforeunload', async () => {
+            try {
+                await auth.signOut();
+            } catch (e) {
+                console.error('Error signing out on page leave:', e);
+            }
+        });
+
         // Login form submit (Firebase Email/Password)
         document.getElementById('adminLogin').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -283,7 +279,12 @@
                 await auth.signInWithEmailAndPassword(email, password);
                 // Auth state handler will check whitelist and show dashboard if authorized
             } catch (err) {
-                loginError.textContent = err.message || 'Login failed';
+                // Simplify common Firebase error message
+                if (err.code === 'auth/invalid-credential') {
+                    loginError.textContent = 'The supplied auth credential is incorrect';
+                } else {
+                    loginError.textContent = err.message || 'Login failed';
+                }
                 loginError.style.display = 'block';
             }
         });
@@ -295,7 +296,7 @@
         });
 
         function showLogin() {
-            loginForm.style.display = 'block';
+            loginForm.style.display = 'flex';
             dashboard.style.display = 'none';
             loginError.style.display = 'none';
         }
@@ -308,11 +309,28 @@
 
         function formatDate(timestamp) {
             if (!timestamp) return '-';
-            return timestamp.toDate().toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
+            let date;
+            try {
+                // Firestore Timestamp
+                if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+                    date = timestamp.toDate();
+                } else if (timestamp instanceof Date) {
+                    date = timestamp;
+                } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+                    date = new Date(timestamp);
+                } else {
+                    return '-';
+                }
+                if (isNaN(date.getTime())) return '-';
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                console.error('Error formatting date:', e);
+                return '-';
+            }
         }
 
         function getStatusBadge(status) {
@@ -364,7 +382,7 @@
                 appDetailModal.show();
 
                 if (collection === 'applications') {
-                    attachReviewFormHandlers(docId, data.status || 'submitted');
+                    attachReviewFormHandlers(docId, data);
                 }
             } catch (err) {
                 console.error(`Error loading ${collection}:`, err);
@@ -374,68 +392,73 @@
 
         function buildApplicationDetails(data) {
             const statusOptions = ['submitted', 'under_review', 'meeting_scheduled', 'due_diligence', 'approved', 'rejected', 'invested', 'incubation', 'closed'];
+            const rating = parseInt(data.rating) || 0;
 
-            let html = `<div class="row g-3">
-                <div class="col-lg-8">
-                    <h6 class="border-bottom pb-2">Application Information</h6>
-                    <table class="table table-sm table-dark">
-                        <tr><td style="width: 30%;"><strong>Application ID:</strong></td><td>${data.id}</td></tr>
-                        <tr><td><strong>Profile:</strong></td><td>${data.profileSelected || 'N/A'}</td></tr>
-                        <tr><td><strong>Submitted:</strong></td><td>${formatDate(data.submittedAt)}</td></tr>
-                    </table>
+            let html = `
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <h4 class="mb-0">Application Details</h4>
+                        <div id="starRating" class="d-flex align-items-center gap-1" data-doc-id="${data.id}">
+                            ${[1,2,3,4,5].map(n => `
+                                <i class="bi bi-star${n <= rating ? '-fill' : ''} star-icon text-warning"
+                                   style="cursor: pointer; font-size: 1.1rem;"
+                                   data-rating="${n}"
+                                   title="${n} star${n > 1 ? 's' : ''}"></i>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ${getStatusBadge(data.status || 'submitted')}
+                </div>
 
-                    <h6 class="border-bottom pb-2 mt-4">Founder Information</h6>
-                    <table class="table table-sm table-dark">
-                        <tr><td style="width: 30%;"><strong>Full Name:</strong></td><td>${data.founderName || '-'}</td></tr>
-                        <tr><td><strong>Email:</strong></td><td>${data.founderEmail || '-'}</td></tr>
-                        <tr><td><strong>Phone:</strong></td><td>${data.founderPhone || '-'}</td></tr>
-                        <tr><td><strong>LinkedIn:</strong></td><td>${data.founderLinkedIn || '-'}</td></tr>
-                    </table>`;
+                <table class="table table-sm table-dark mb-4">
+                    <tr><td style="width: 25%;"><strong>Application ID:</strong></td><td>${data.id}</td></tr>
+                    <tr><td><strong>Profile:</strong></td><td>${data.profileSelected || 'N/A'}</td></tr>
+                    <tr><td><strong>Submitted:</strong></td><td>${formatDate(data.submittedAt)}</td></tr>
+                </table>
+
+                <h6 class="border-bottom pb-2 mb-3">Founder Information</h6>
+                <table class="table table-sm table-dark mb-4">
+                    <tr><td style="width: 25%;"><strong>Full Name:</strong></td><td>${data.founderName || '-'}</td></tr>
+                    <tr><td><strong>Email:</strong></td><td>${data.founderEmail || '-'}</td></tr>
+                    <tr><td><strong>Phone:</strong></td><td>${data.founderPhone || '-'}</td></tr>
+                    <tr><td><strong>LinkedIn:</strong></td><td>${data.founderLinkedIn || '-'}</td></tr>
+                </table>`;
 
             // Profile-specific fields
             const exclude = ['founderName', 'founderEmail', 'founderPhone', 'founderLinkedIn', 'profileSelected', 'status', 'submittedAt', 'source', 'id', 'govCheck'];
             const profileFields = Object.keys(data).filter(k => !exclude.includes(k) && data[k]);
 
             if (profileFields.length > 0) {
-                html += `<h6 class="border-bottom pb-2 mt-4">Application Details</h6>
-                    <table class="table table-sm table-dark">`;
+                html += `<h6 class="border-bottom pb-2 mb-3">Application Details</h6>
+                    <table class="table table-sm table-dark mb-4">`;
                 profileFields.forEach(field => {
                     const label = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
                     const value = Array.isArray(data[field]) ? data[field].join(', ') : data[field];
-                    html += `<tr><td style="width: 30%;"><strong>${label}:</strong></td><td>${value}</td></tr>`;
+                    html += `<tr><td style="width: 25%;"><strong>${label}:</strong></td><td>${value}</td></tr>`;
                 });
                 html += `</table>`;
             }
 
-            html += `</div>`;
+            // Reviewer Comments - full width
+            html += `<h6 class="border-bottom pb-2 mb-3">Reviewer Comments</h6>
+                <textarea class="form-control mb-4" id="reviewComments" name="comments" rows="4" style="min-height: 120px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text); font-family: var(--font-body);" placeholder="Add internal notes...">${data.reviewerComments || ''}</textarea>`;
 
-            // Review Actions Column
-            html += `<div class="col-lg-4">
-                <div class="card bg-dark border-secondary">
-                    <div class="card-body">
-                        <h6 class="card-title mb-3">Review Actions</h6>
-                        <form id="reviewForm">
-                            <div class="mb-3">
-                                <label class="form-label small text-muted">Current Status</label>
-                                <div class="mb-2">${getStatusBadge(data.status || 'submitted')}</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Update Status</label>
-                                <select class="form-select form-select-sm" id="reviewStatus" name="status">`;
+            // Review Form - status selector and save button at bottom
+            html += `<div class="card bg-dark border-secondary mb-3">
+                <div class="card-body">
+                    <form id="reviewForm" class="d-flex gap-2 align-items-end">
+                        <div class="flex-grow-1">
+                            <label class="form-label small text-muted mb-1">Update Status</label>
+                            <select class="form-select form-select-sm" id="reviewStatus" name="status" style="padding: 0.35rem 0.75rem; font-size: 0.875rem;">`;
             statusOptions.forEach(opt => {
-                html += `<option value="${opt}" ${data.status === opt ? 'selected' : ''}>${opt.replace('_', ' ').toUpperCase()}</option>`;
+                html += `<option value="${opt}" ${data.status === opt ? 'selected' : ''}>${opt.replace('_', ' ')}</option>`;
             });
             html += `      </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Reviewer Comments</label>
-                                <textarea class="form-control form-control-sm" id="reviewComments" name="comments" rows="4" placeholder="Add internal notes...">${data.reviewerComments || ''}</textarea>
-                            </div>
-                            <button type="submit" class="btn btn-sm btn--primary w-100">Save Review</button>
-                        </form>
-                        <div id="reviewSuccess" class="alert alert-success mt-2 py-2 px-3" style="display: none; font-size: 0.85rem;"></div>
-                        <div id="reviewError" class="alert alert-danger mt-2 py-2 px-3" style="display: none; font-size: 0.85rem;"></div>
-                    </div>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn-sm" style="padding: 0.35rem 1rem; font-size: 0.875rem; white-space: nowrap;">Save Review</button>
+                    </form>
+                    <div id="reviewSuccess" class="alert alert-success mt-2 py-2 px-3" style="display: none; font-size: 0.85rem;"></div>
+                    <div id="reviewError" class="alert alert-danger mt-2 py-2 px-3" style="display: none; font-size: 0.85rem;"></div>
                 </div>
             </div>`;
 
@@ -469,9 +492,37 @@
             return html;
         }
 
-        function attachReviewFormHandlers(docId, currentStatus) {
+        function attachReviewFormHandlers(docId, data) {
             const form = document.getElementById('reviewForm');
             if (!form) return;
+            // Store original data to refresh modal after save
+            form.dataset.docId = docId;
+            form.dataset.originalStatus = data.status || 'submitted';
+
+            // Star rating click handler
+            const starContainer = document.getElementById('starRating');
+            if (starContainer) {
+                starContainer.addEventListener('click', async (e) => {
+                    if (e.target.classList.contains('star-icon')) {
+                        const rating = parseInt(e.target.dataset.rating);
+                        // Update visual state
+                        const stars = starContainer.querySelectorAll('.star-icon');
+                        stars.forEach((star, idx) => {
+                            star.classList.toggle('bi-star-fill', idx < rating);
+                            star.classList.toggle('bi-star', idx >= rating);
+                        });
+
+                        // Save to database
+                        try {
+                            await firebase.firestore().collection('applications').doc(docId)
+                                .update({ rating: rating });
+                            console.log('Rating saved:', rating);
+                        } catch (err) {
+                            console.error('Error saving rating:', err);
+                        }
+                    }
+                });
+            }
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -485,14 +536,97 @@
 
                 try {
                     await updateApplicationStatus(docId, status, comments);
-                    successEl.textContent = '✓ Review saved & status updated to ' + status.replace('_', ' ').toUpperCase();
+                    successEl.textContent = '✓ Review saved & status updated';
                     successEl.style.display = 'block';
+
+                    // Update status badge in header
+                    const header = document.querySelector('.modal-title').parentElement;
+                    const existingBadge = header.querySelector('.badge');
+                    if (existingBadge) {
+                        existingBadge.replaceWith(createStatusBadge(status));
+                    } else {
+                        header.insertAdjacentElement('afterbegin', createStatusBadge(status));
+                    }
+
                     setTimeout(() => successEl.style.display = 'none', 5000);
                 } catch (err) {
                     errorEl.textContent = 'Failed to save: ' + err.message;
                     errorEl.style.display = 'block';
                 }
             });
+        }
+
+        function renderApplicationsTable(apps) {
+            applicationsTableBody.innerHTML = apps.map(app => {
+                const rating = parseInt(app.rating) || 0;
+                const stars = [1,2,3,4,5].map(n =>
+                    `<i class="bi bi-star${n <= rating ? '-fill' : ''} text-warning" style="font-size: 0.9rem;"></i>`
+                ).join('');
+                return `
+                    <tr>
+                        <td>${formatDate(app.submittedAt)}</td>
+                        <td>${app.founderName || app.founderEmail || 'Anonymous'}</td>
+                        <td>${app.founderEmail || '-'}</td>
+                        <td>${app.profileSelected || '-'}</td>
+                        <td style="text-align: center; min-width: 120px;">${stars}</td>
+                        <td>
+                            <select class="form-select form-select-sm" onchange="updateApplicationStatus('${app.id}', this.value)" style="width: auto; display: inline-block;">
+                                <option value="submitted" ${app.status === 'submitted' ? 'selected' : ''}>Submitted</option>
+                                <option value="under_review" ${app.status === 'under_review' ? 'selected' : ''}>Under Review</option>
+                                <option value="meeting_scheduled" ${app.status === 'meeting_scheduled' ? 'selected' : ''}>Meeting Scheduled</option>
+                                <option value="due_diligence" ${app.status === 'due_diligence' ? 'selected' : ''}>Due Diligence</option>
+                                <option value="approved" ${app.status === 'approved' ? 'selected' : ''}>Approved</option>
+                                <option value="rejected" ${app.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                                <option value="invested" ${app.status === 'invested' ? 'selected' : ''}>Invested</option>
+                                <option value="incubation" ${app.status === 'incubation' ? 'selected' : ''}>Incubation</option>
+                                <option value="closed" ${app.status === 'closed' ? 'selected' : ''}>Closed</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn--outline" onclick='showApplicationDetails("${app.id}")'>Details</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function applyFilters() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const ratingFilter = document.getElementById('filterRating').value;
+
+            let filtered = allApplications;
+
+            // Filter by status
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(app => app.status === statusFilter);
+            }
+
+            // Filter by rating
+            if (ratingFilter !== 'all') {
+                const minRating = parseInt(ratingFilter);
+                filtered = filtered.filter(app => {
+                    const rating = parseInt(app.rating) || 0;
+                    if (ratingFilter === '0') {
+                        return rating === 0;
+                    }
+                    return rating >= minRating;
+                });
+            }
+
+            renderApplicationsTable(filtered);
+        }
+
+        function clearFilters() {
+            document.getElementById('filterStatus').value = 'all';
+            document.getElementById('filterRating').value = 'all';
+            renderApplicationsTable(allApplications);
+        }
+
+        function createStatusBadge(status) {
+            const badge = document.createElement('span');
+            badge.className = 'badge ' + (status === 'approved' ? 'bg-success' : status === 'rejected' ? 'bg-danger' : 'bg-info');
+            badge.textContent = status.replace('_', ' ').toUpperCase();
+            return badge;
         }
 
         async function updateApplicationStatus(docId, newStatus, comments = null) {
@@ -518,17 +652,6 @@
             }
         }
 
-        async function updateApplicationStatus(appDocId, newStatus) {
-            try {
-                await firebase.firestore().collection('applications').doc(appDocId).update({ status: newStatus });
-                alert(`Application status updated to: ${newStatus}`);
-                loadData();
-            } catch (err) {
-                console.error('Error updating application:', err);
-                alert('Failed to update application');
-            }
-        }
-
         async function updateInvestorStatus(inqDocId, status) {
             try {
                 await firebase.firestore().collection('investorInquiries').doc(inqDocId).update({ status, reviewedAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -540,61 +663,64 @@
             }
         }
 
+        // Store raw data for filtering
+        let allApplications = [];
+
         async function loadData() {
             try {
+                console.log('Loading data from Firestore...');
                 const [appsSnap, investorsSnap] = await Promise.all([
                     firebase.firestore().collection('applications').orderBy('submittedAt', 'desc').get(),
                     firebase.firestore().collection('investorInquiries').orderBy('submittedAt', 'desc').get()
                 ]);
 
-                // Stats
+                console.log('Applications count:', appsSnap.size);
+                console.log('Investor inquiries count:', investorsSnap.size);
+                console.log('Investor inquiry sample:', investorsSnap.docs.length > 0 ? investorsSnap.docs[0].data() : 'No data');
+
+                // Store raw applications data for filtering
+                allApplications = appsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Apply any active filters
+                renderApplicationsTable(allApplications);
+
+                // Stats - count applications by status (use all data, not filtered)
+                const apps = allApplications;
+                const pendingCount = apps.filter(a => !a.status || a.status === 'submitted' || a.status === 'pending').length;
+
+                // Approved this month (based on submittedAt timestamp)
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                const approvedThisMonth = apps.filter(app => {
+                    if (app.status !== 'approved') return false;
+                    if (!app.submittedAt) return false;
+                    const date = app.submittedAt.toDate ? app.submittedAt.toDate() : new Date(app.submittedAt);
+                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                }).length;
+
                 document.getElementById('statApplications').textContent = appsSnap.size;
                 document.getElementById('statInvestors').textContent = investorsSnap.size;
-                document.getElementById('statPending').textContent = investorsSnap.docs.filter(d => d.data().status === 'pending').size;
+                document.getElementById('statPending').textContent = pendingCount;
+                document.getElementById('statApproved').textContent = approvedThisMonth;
 
-                // Applications table
-                applicationsTableBody.innerHTML = appsSnap.docs.map(doc => {
-                    const data = doc.data();
-                    return `
-                        <tr>
-                            <td>${formatDate(data.submittedAt)}</td>
-                            <td>${data.founderName || data.founderEmail || 'Anonymous'}</td>
-                            <td>${data.founderEmail || '-'}</td>
-                            <td>${data.profileSelected || '-'}</td>
-                            <td>
-                                <select class="form-select form-select-sm" onchange="updateApplicationStatus('${doc.id}', this.value)" style="width: auto; display: inline-block;">
-                                    <option value="submitted" ${data.status === 'submitted' ? 'selected' : ''}>Submitted</option>
-                                    <option value="under_review" ${data.status === 'under_review' ? 'selected' : ''}>Under Review</option>
-                                    <option value="meeting_scheduled" ${data.status === 'meeting_scheduled' ? 'selected' : ''}>Meeting Scheduled</option>
-                                    <option value="due_diligence" ${data.status === 'due_diligence' ? 'selected' : ''}>Due Diligence</option>
-                                    <option value="approved" ${data.status === 'approved' ? 'selected' : ''}>Approved</option>
-                                    <option value="rejected" ${data.status === 'rejected' ? 'selected' : ''}>Rejected</option>
-                                    <option value="invested" ${data.status === 'invested' ? 'selected' : ''}>Invested</option>
-                                    <option value="incubation" ${data.status === 'incubation' ? 'selected' : ''}>Incubation</option>
-                                    <option value="closed" ${data.status === 'closed' ? 'selected' : ''}>Closed</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn--outline" onclick='showApplicationDetails("${doc.id}")'>Details</button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+                // Applications table is now rendered by renderApplicationsTable()
 
                 // Investors table
+                console.log('Investor inquiries data sample:', investorsSnap.docs.map(d => d.data()));
                 investorsTableBody.innerHTML = investorsSnap.docs.map(doc => {
                     const data = doc.data();
                     return `
                         <tr>
                             <td>${formatDate(data.submittedAt)}</td>
-                            <td>${data.name}</td>
-                            <td>${data.email}</td>
+                            <td>${data.name || data.fullName || data.investorName || '-'}</td>
+                            <td>${data.email || data.investorEmail || '-'}</td>
                             <td>${data.company || '-'}</td>
-                            <td>${data.investmentRange || '-'}</td>
+                            <td>${data.investmentRange || data.range || '-'}</td>
                             <td>${getStatusBadge(data.status || 'pending')}</td>
                             <td>
                                 <button class="btn btn-sm btn--outline me-1" onclick='showInvestorDetails("${doc.id}")'>Details</button>
-                                ${data.status === 'pending' ? `
+                                ${(!data.status || data.status === 'pending') ? `
                                     <button class="btn btn-sm btn-success" onclick="updateInvestorStatus('${doc.id}', 'approved')">Approve</button>
                                     <button class="btn btn-sm btn-danger" onclick="updateInvestorStatus('${doc.id}', 'rejected')">Reject</button>
                                 ` : '<span class="text-muted">-</span>'}

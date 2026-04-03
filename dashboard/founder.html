@@ -13,13 +13,6 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="../ideacubator.css" rel="stylesheet">
-
-    <style>
-        body {
-            padding-top: 64px;
-            background: var(--bg);
-        }
-    </style>
 </head>
 
 <body>
@@ -39,102 +32,32 @@
                     <p class="mt-2">Loading your data...</p>
                 </div>
 
-                <!-- Profile Card -->
-                <div id="profileCard" class="card mb-4" style="display: none;">
+                <!-- Applications List -->
+                <div id="noApplications" class="alert alert-info" style="display: none;">
+                    <h5>No Applications Found</h5>
+                    <p>You haven't submitted an application yet.</p>
+                    <a href="../index.html#apply" class="btn btn--primary">Start Your Application</a>
+                </div>
+                <div id="applicationsList" class="card" style="display: none;">
                     <div class="card-body">
-                        <div class="d-flex align-items-center gap-3">
-                            <img id="userPhoto" src="" alt="Profile" class="rounded-circle"
-                                style="width: 64px; height: 64px; object-fit: cover;">
-                            <div>
-                                <h5 id="displayName" class="mb-1"></h5>
-                                <p id="userEmail" class="text-muted mb-0"></p>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Profile Type</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="appsTableBody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tabs -->
-                <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist" style="display: none;">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="applications-tab" data-bs-toggle="tab"
-                            data-bs-target="#applications" type="button">My Applications</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="inquiries-tab" data-bs-toggle="tab" data-bs-target="#inquiries"
-                            type="button">Investor Registrations</button>
-                    </li>
-                </ul>
-
-                <!-- Tab Content -->
-                <div class="tab-content" id="dashboardTabContent" style="display: none;">
-                    <!-- Applications Tab -->
-                    <div class="tab-pane fade show active" id="applications" role="tabpanel">
-                        <div id="noApplications" class="alert alert-info" style="display: none;">
-                            <h5>No Applications Found</h5>
-                            <p>You haven't submitted an application yet.</p>
-                            <a href="../index.html#apply" class="btn btn--primary">Start Your Application</a>
-                        </div>
-                        <div id="applicationsList" class="card" style="display: none;">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-dark table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Profile Type</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="appsTableBody">
-                                            <!-- Populated by JS -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Investor Inquiries Tab -->
-                    <div class="tab-pane fade" id="inquiries" role="tabpanel">
-                        <div id="noInquiries" class="alert alert-info" style="display: none;">
-                            <h5>No Investor Registrations</h5>
-                            <p>You haven't registered as an investor yet.</p>
-                            <a href="invest.html" class="btn btn--outline">Register as Investor</a>
-                        </div>
-                        <div id="inquiriesList" class="card" style="display: none;">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-dark table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Company</th>
-                                                <th>Investment Range</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="inquiriesTableBody">
-                                            <!-- Populated by JS -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- No Data Message (shown when both tabs are empty) -->
-                <div id="noDataMessage" class="alert alert-info text-center"
-                    style="display: none; max-width: 600px; margin: 2rem auto;">
-                    <h4>No Data Found</h4>
-                    <p class="mb-3">We couldn't find any applications or investor registrations associated with this
-                        email address.</p>
-                    <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <a href="../index.html#apply" class="btn btn--primary">Submit an Application</a>
-                        <a href="invest.html" class="btn btn--outline">Register as Investor</a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -177,18 +100,9 @@
 
         // DOM Elements
         const loadingEl = document.getElementById('loading');
-        const profileCard = document.getElementById('profileCard');
-        const dashboardTabs = document.getElementById('dashboardTabs');
-        const dashboardTabContent = document.getElementById('dashboardTabContent');
-        const userNameEl = document.getElementById('displayName');
-        const userEmailEl = document.getElementById('userEmail');
-        const userPhotoEl = document.getElementById('userPhoto');
         const noApplicationsEl = document.getElementById('noApplications');
         const applicationsListEl = document.getElementById('applicationsList');
         const appsTableBody = document.getElementById('appsTableBody');
-        const noInquiriesEl = document.getElementById('noInquiries');
-        const inquiriesListEl = document.getElementById('inquiriesList');
-        const inquiriesTableBody = document.getElementById('inquiriesTableBody');
         const appDetailModal = new bootstrap.Modal(document.getElementById('appDetailModal'));
         const appDetailContent = document.getElementById('appDetailContent');
 
@@ -200,6 +114,7 @@
             const dashboardLink = document.querySelector('.nav__dashboard-link');
             const logoutBtn = document.getElementById('logoutBtn');
             const loginBtn = document.getElementById('loginBtn');
+            const userNameDisplay = document.getElementById('userNameDisplay');
 
             if (!dashboardLink || !logoutBtn || !loginBtn) return; // Navbar not loaded yet
 
@@ -207,10 +122,18 @@
                 dashboardLink.style.display = 'inline-flex';
                 logoutBtn.style.display = 'inline-flex';
                 loginBtn.style.display = 'none';
+                if (userNameDisplay) {
+                    const name = user.displayName || user.email.split('@')[0];
+                    userNameDisplay.textContent = name;
+                    userNameDisplay.style.display = 'inline';
+                }
             } else {
                 dashboardLink.style.display = 'none';
                 logoutBtn.style.display = 'none';
                 loginBtn.style.display = 'inline-flex';
+                if (userNameDisplay) {
+                    userNameDisplay.style.display = 'none';
+                }
             }
         }
 
@@ -255,20 +178,13 @@
             });
         }
 
-        // Show application details from data attribute ( safely encoded )
+        // Show application details (read-only) from data attribute
         window.showApplicationFromEncoded = function (btn) {
             const encoded = btn.getAttribute('data-app');
             if (!encoded) return;
             try {
                 const appData = JSON.parse(decodeURIComponent(encoded));
-                let html = `<div class="row"><div class="col-md-6"><h6>Profile Type</h6><p>${appData.profileSelected}</p></div>`;
-                html += `<div class="col-md-6"><h6>Status</h6><p>${getStatusBadge(appData.status || 'new')}</p></div>`;
-                html += `<div class="col-md-6"><h6>Submitted</h6><p>${formatDate(appData.submittedAt)}</p></div>`;
-                if (appData.founderEmail) {
-                    html += `<div class="col-md-6"><h6>Email</h6><p>${appData.founderEmail}</p></div>`;
-                }
-                html += '</div><hr><h6 class="mt-3">Submitted Data</h6><pre class="bg-dark p-3 rounded" style="max-height: 500px; overflow-y: auto; font-size: 0.85rem;">' + JSON.stringify(appData, null, 2) + '</pre>';
-                appDetailContent.innerHTML = html;
+                buildReadOnlyApplicationDetails(appData);
                 appDetailModal.show();
             } catch (err) {
                 console.error('Error displaying application:', err);
@@ -276,7 +192,205 @@
             }
         };
 
-        // Main: Load data for logged-in user
+        // Build read-only application details
+        function buildReadOnlyApplicationDetails(data) {
+            let html = `<div class="row g-3">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Application Details</h5>
+                        ${getStatusBadge(data.status || 'submitted')}
+                    </div>
+                    <table class="table table-sm table-dark">
+                        <tr><td style="width: 25%;"><strong>Application ID:</strong></td><td>${data.id || 'N/A'}</td></tr>
+                        <tr><td><strong>Profile:</strong></td><td>${data.profileSelected || 'N/A'}</td></tr>
+                        <tr><td><strong>Submitted:</strong></td><td>${formatDate(data.submittedAt)}</td></tr>
+                    </table>
+
+                    <h6 class="border-bottom pb-2 mt-3">Founder Information</h6>
+                    <table class="table table-sm table-dark">
+                        <tr><td style="width: 25%;"><strong>Full Name:</strong></td><td>${data.founderName || '-'}</td></tr>
+                        <tr><td><strong>Email:</strong></td><td>${data.founderEmail || '-'}</td></tr>
+                        <tr><td><strong>Phone:</strong></td><td>${data.founderPhone || '-'}</td></tr>
+                        <tr><td><strong>LinkedIn:</strong></td><td>${data.founderLinkedIn || '-'}</td></tr>
+                    </table>
+
+                    <h6 class="border-bottom pb-2 mt-3">Application Data</h6>
+                    <table class="table table-sm table-dark">
+                        ${Object.keys(data).filter(k => !['id', 'founderName', 'founderEmail', 'founderPhone', 'founderLinkedIn', 'profileSelected', 'status', 'submittedAt', 'source', 'govCheck', 'reviewerComments', 'reviewedAt', 'rating'].includes(k)).map(key => `
+                            <tr><td style="width: 25%;"><strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong></td><td>${Array.isArray(data[key]) ? data[key].join(', ') : data[key]}</td></tr>
+                        `).join('')}
+                    </table>
+
+                    ${data.reviewerComments ? `
+                        <h6 class="border-bottom pb-2 mt-3">Reviewer Comments</h6>
+                        <div class="bg-dark p-3 rounded mb-3" style="font-size: 0.9rem;">${data.reviewerComments}</div>
+                    ` : ''}
+                </div>
+            </div>`;
+            appDetailContent.innerHTML = html;
+        }
+
+        // Show editable application form (only for submitted/under_review status)
+        window.showEditableApplication = function (btn) {
+            const encoded = btn.getAttribute('data-app');
+            const docId = btn.getAttribute('data-doc-id');
+            if (!encoded || !docId) return;
+            try {
+                const appData = JSON.parse(decodeURIComponent(encoded));
+                buildEditableApplicationForm(appData, docId);
+                appDetailModal.show();
+            } catch (err) {
+                console.error('Error displaying application:', err);
+                alert('Failed to load application details.');
+            }
+        };
+
+        // Build editable application form (excludes personal info)
+        function buildEditableApplicationForm(data, docId) {
+            const excludeFields = ['id', 'founderName', 'founderEmail', 'founderPhone', 'founderLinkedIn', 'profileSelected', 'status', 'submittedAt', 'source', 'govCheck', 'reviewerComments', 'reviewedAt', 'rating'];
+            const editableFields = Object.keys(data).filter(k => !excludeFields.includes(k) && data[k]);
+
+            let html = `<form id="editApplicationForm">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Profile Type</label>
+                    <input type="text" class="form-control" value="${data.profileSelected || ''}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Current Status</label>
+                    <div>${getStatusBadge(data.status || 'submitted')}</div>
+                </div>`;
+
+            if (editableFields.length > 0) {
+                html += `<h6 class="border-bottom pb-2">Application Details (Editable)</h6>`;
+                editableFields.forEach(field => {
+                    const label = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                    const value = Array.isArray(data[field]) ? data[field].join(', ') : data[field];
+                    html += `
+                        <div class="mb-3">
+                            <label class="form-label">${label}</label>
+                            <input type="text" class="form-control" name="${field}" value="${value.replace(/"/g, '&quot;')}">
+                        </div>
+                    `;
+                });
+            } else {
+                html += `<p class="text-muted">No editable fields found.</p>`;
+            }
+
+            html += `
+                <div class="mb-3">
+                    <label class="form-label">Additional Notes / Changes</label>
+                    <textarea class="form-control" name="founderNotes" rows="3" placeholder="Add any notes or requested changes..."></textarea>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn--outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn--primary">Save Changes</button>
+                </div>
+            </form>`;
+
+            appDetailContent.innerHTML = html;
+
+            // Attach form handler
+            const form = document.getElementById('editApplicationForm');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await saveApplicationChanges(docId, form);
+                });
+            }
+        }
+
+        // Save application changes
+        async function saveApplicationChanges(docId, form) {
+            try {
+                const updateData = {};
+                const formData = new FormData(form);
+                formData.forEach((value, key) => {
+                    if (key !== 'founderNotes') {
+                        updateData[key] = value;
+                    }
+                });
+
+                // Add update timestamp
+                updateData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+
+                await firebase.firestore().collection('applications').doc(docId).update(updateData);
+
+                // Show success message
+                alert('Application updated successfully!');
+                appDetailModal.hide();
+
+                // Refresh table
+                loadData();
+            } catch (err) {
+                console.error('Error updating application:', err);
+                alert('Failed to update application: ' + err.message);
+            }
+        }
+
+        // Load data for current user
+        async function loadData() {
+            const user = currentUser;
+            if (!user) return;
+
+            loadingEl.style.display = 'block';
+            noApplicationsEl.style.display = 'none';
+            applicationsListEl.style.display = 'none';
+
+            try {
+                // Load user's applications (where founderEmail === user.email)
+                const appsSnapshot = await db.collection('applications')
+                    .where('founderEmail', '==', user.email)
+                    .orderBy('submittedAt', 'desc')
+                    .get();
+
+                loadingEl.style.display = 'none';
+
+                if (appsSnapshot.empty) {
+                    // No applications
+                    noApplicationsEl.style.display = 'block';
+                    applicationsListEl.style.display = 'none';
+                } else {
+                    // Has applications - show table
+                    noApplicationsEl.style.display = 'none';
+                    applicationsListEl.style.display = 'block';
+                    appsTableBody.innerHTML = appsSnapshot.docs.map(doc => {
+                        const data = doc.data();
+                        const encoded = encodeURIComponent(JSON.stringify(data));
+                        const canEdit = !data.status || data.status === 'submitted' || data.status === 'under_review';
+                        return `
+                            <tr>
+                                <td>${formatDate(data.submittedAt)}</td>
+                                <td>${data.profileSelected}</td>
+                                <td>${getStatusBadge(data.status || 'new')}</td>
+                                <td>
+                                    ${canEdit ?
+                                        `<button class="btn btn-sm btn--primary"
+                                                data-app="${encoded}"
+                                                data-doc-id="${doc.id}"
+                                                onclick="showEditableApplication(this)">
+                                            Edit
+                                        </button>` :
+                                        `<button class="btn btn-sm btn--outline"
+                                                data-app="${encoded}"
+                                                data-doc-id="${doc.id}"
+                                                onclick="showApplicationFromEncoded(this)"
+                                                disabled>
+                                            View
+                                        </button>`
+                                    }
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+            } catch (err) {
+                console.error('Error loading data:', err);
+                loadingEl.innerHTML = '<p class="text-danger">Error loading data. Please refresh or try again.</p>';
+            }
+        }
+
+        // Auth state change handler
         auth.onAuthStateChanged(async (user) => {
             currentUser = user;
 
@@ -288,96 +402,8 @@
             // Update navbar UI
             updateNavbarAuthUI(user);
 
-            // Update profile info
-            if (userNameEl) userNameEl.textContent = user.displayName || user.email.split('@')[0];
-            if (userEmailEl) userEmailEl.textContent = user.email;
-            if (userPhotoEl) userPhotoEl.src = user.photoURL || '../assets/img/logo.png';
-
-            loadingEl.style.display = 'block';
-            profileCard.style.display = 'none';
-            dashboardTabs.style.display = 'none';
-            dashboardTabContent.style.display = 'none';
-
-            try {
-                // Load user's applications (where founderEmail === user.email)
-                const appsSnapshot = await db.collection('applications')
-                    .where('founderEmail', '==', user.email)
-                    .orderBy('submittedAt', 'desc')
-                    .get();
-
-                // Load user's investor inquiries (where email === user.email)
-                const inquiriesSnapshot = await db.collection('investorInquiries')
-                    .where('email', '==', user.email)
-                    .orderBy('submittedAt', 'desc')
-                    .get();
-
-                loadingEl.style.display = 'none';
-                profileCard.style.display = 'block';
-                dashboardTabs.style.display = 'flex';
-                dashboardTabContent.style.display = 'block';
-
-                const hasApps = !appsSnapshot.empty;
-                const hasInquiries = !inquiriesSnapshot.empty;
-
-                if (!hasApps && !hasInquiries) {
-                    // No data at all - show unified message, hide tabs
-                    document.getElementById('noDataMessage').style.display = 'block';
-                    dashboardTabs.style.display = 'none';
-                    dashboardTabContent.style.display = 'none';
-                } else {
-                    // Has at least one type of data - show tabs
-                    document.getElementById('noDataMessage').style.display = 'none';
-                    dashboardTabs.style.display = 'flex';
-                    dashboardTabContent.style.display = 'block';
-
-                    // Applications Tab
-                    if (hasApps) {
-                        noApplicationsEl.style.display = 'none';
-                        applicationsListEl.style.display = 'block';
-                        appsTableBody.innerHTML = appsSnapshot.docs.map(doc => {
-                            const data = doc.data();
-                            const encoded = encodeURIComponent(JSON.stringify(data));
-                            return `
-                                <tr>
-                                    <td>${formatDate(data.submittedAt)}</td>
-                                    <td>${data.profileSelected}</td>
-                                    <td>${getStatusBadge(data.status || 'new')}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn--outline" data-app="${encoded}" onclick="showApplicationFromEncoded(this)">View</button>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('');
-                    } else {
-                        noApplicationsEl.style.display = 'block';
-                        applicationsListEl.style.display = 'none';
-                    }
-
-                    // Inquiries Tab
-                    if (hasInquiries) {
-                        noInquiriesEl.style.display = 'none';
-                        inquiriesListEl.style.display = 'block';
-                        inquiriesTableBody.innerHTML = inquiriesSnapshot.docs.map(doc => {
-                            const data = doc.data();
-                            return `
-                                <tr>
-                                    <td>${formatDate(data.submittedAt)}</td>
-                                    <td>${data.company || '-'}</td>
-                                    <td>${data.investmentRange || '-'}</td>
-                                    <td>${getStatusBadge(data.status || 'pending')}</td>
-                                </tr>
-                            `;
-                        }).join('');
-                    } else {
-                        noInquiriesEl.style.display = 'block';
-                        inquiriesListEl.style.display = 'none';
-                    }
-                }
-
-            } catch (err) {
-                console.error('Error loading data:', err);
-                loadingEl.innerHTML = '<p class="text-danger">Error loading data. Please refresh or try again.</p>';
-            }
+            // Load user data
+            await loadData();
         });
     </script>
 </body>
