@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Founder Dashboard — Ideacubator</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../refined_design.css">
+  <style>
+    body { background: var(--paper); }
+    .dash-page { padding-top: calc(var(--nav-h) + 40px); min-height: 100svh; }
+    .dash-header { margin-bottom: 40px; }
+    .dash-h1 { font-family: var(--font-serif); font-size: 32px; margin-bottom: 8px; }
+    .dash-sub { color: var(--ink3); font-size: 14px; }
+    
+    .app-card { background: #fff; border: 1px solid var(--border); border-radius: var(--r); padding: 24px; margin-bottom: 20px; transition: all .2s; }
+    .app-card:hover { border-color: var(--accent2); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,.04); }
+    .app-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .app-meta { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink3); }
+    .app-profile { font-family: var(--font-serif); font-size: 20px; color: var(--accent); margin-bottom: 4px; }
+    .app-status { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: #eee; }
+    
+    .status-submitted { background: #e3f2fd; color: #1976d2; }
+    .status-under_review { background: #fff8e1; color: #f57f17; }
+    .status-approved { background: #e8f5e9; color: #2e7d32; }
+    .status-rejected { background: #ffebee; color: #c62828; }
+    
+    .app-details-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; font-size: 13px; border-top: 1px solid var(--border); padding-top: 16px; }
+    .detail-item label { color: var(--ink3); margin-bottom: 4px; display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; }
+    .detail-item span { color: var(--ink); }
+
+    .empty-state { text-align: center; padding: 80px 20px; }
+    .empty-icon { font-size: 48px; margin-bottom: 20px; opacity: .5; }
+    .empty-h3 { font-family: var(--font-serif); font-size: 24px; margin-bottom: 12px; }
+  </style>
+
+  <!-- Firebase SDK (v8 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main class="dash-page">
+    <div class="container">
+      <header class="dash-header">
+        <h1 class="dash-h1">Founder Dashboard</h1>
+        <p class="dash-sub" id="user-greeting">Welcome back to Ideacubator.</p>
+      </header>
+
+      <div id="loading-state" style="text-align: center; padding: 40px;">
+        <div style="font-size: 14px; color: var(--ink3);">Syncing your applications...</div>
+      </div>
+
+      <div id="app-list"></div>
+
+      <div id="no-apps" class="empty-state" style="display: none;">
+        <div class="empty-icon">🌱</div>
+        <h3 class="empty-h3">No applications yet.</h3>
+        <p style="color: var(--ink3); margin-bottom: 24px;">Your journey starts with a single idea.</p>
+        <a href="../index.html#apply" class="btn-primary">Tell us your idea</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../refined_logic.js"></script>
+  <script>
+    // Load Navbar
+    fetch('../navbar.html')
+      .then(r => r.text())
+      .then(h => {
+        document.getElementById('navbar-placeholder').innerHTML = h;
+        // Adjust links for subdirectory
+        const links = document.querySelectorAll('#navbar-placeholder a');
+        links.forEach(l => {
+          if (!l.href.startsWith('http')) {
+            const path = l.getAttribute('href');
+            if (path.startsWith('/')) l.setAttribute('href', '..' + path);
+            else l.setAttribute('href', '../' + path);
+          }
+        });
+      });
+
+    // Dash Logic
+    auth.onAuthStateChanged(async user => {
+        if(!user) {
+            window.location.href = '../index.html';
+            return;
+        }
+        document.getElementById('user-greeting').textContent = `Welcome back, ${user.displayName || user.email.split('@')[0]}.`;
+        loadApps(user.email);
+    });
+
+    async function loadApps(email) {
+        const list = document.getElementById('app-list');
+        const empty = document.getElementById('no-apps');
+        const loader = document.getElementById('loading-state');
+        
+        try {
+            const snap = await db.collection('applications')
+                .where('email', '==', email)
+                .get();
+
+            // Try fallback query for older schema
+            let docs = snap.docs;
+            if (docs.length === 0) {
+                const snap2 = await db.collection('applications')
+                    .where('founderEmail', '==', email)
+                    .get();
+                docs = snap2.docs;
+            }
+
+            // Sort by submittedAt desc in JS to avoid index requirement
+            docs.sort((a, b) => {
+                const tA = a.data().submittedAt?.toMillis() || 0;
+                const tB = b.data().submittedAt?.toMillis() || 0;
+                return tB - tA;
+            });
+
+            loader.style.display = 'none';
+
+            if (docs.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+
+            list.innerHTML = docs.map(doc => {
+                const d = doc.data();
+                const status = d.status || 'submitted';
+                const date = d.submittedAt ? d.submittedAt.toDate().toLocaleDateString() : 'Recent';
+                const formData = d.data || {}; // New schema fields
+                const oldFields = d.profileSelected ? d : {}; // Old schema fallback
+                
+                // Merge data for display
+                const displayData = { ...oldFields, ...formData };
+                const exclude = ['id', 'email', 'founderEmail', 'userId', 'submittedAt', 'status', 'profile', 'profileLabel', 'source', '_consent_accuracy', '_consent_contact'];
+                
+                // Map of technical field names to readable labels if needed (optional)
+                
+                return `
+                    <div class="app-card reveal visible">
+                        <div class="app-top">
+                            <div>
+                                <div class="app-meta">Applied on ${date}</div>
+                                <div class="app-profile">${d.profileLabel || d.profileSelected || 'Startup Application'}</div>
+                            </div>
+                            <span class="app-status status-${status}">${status.replace('_', ' ')}</span>
+                        </div>
+                        <div class="app-details-grid">
+                            ${Object.keys(displayData)
+                                .filter(k => !exclude.includes(k) && displayData[k])
+                                .slice(0, 8) // Show only first 8 fields to keep it clean
+                                .map(k => `
+                                    <div class="detail-item">
+                                        <label>${k.replace(/_/g, ' ')}</label>
+                                        <span>${displayData[k]}</span>
+                                    </div>
+                                `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+        } catch (err) {
+            console.error('Error loading apps:', err);
+            loader.innerHTML = `<div style="color:red">Failed to load data: ${err.message}</div>`;
+        }
+    }
+  </script>
+</body>
+</html>

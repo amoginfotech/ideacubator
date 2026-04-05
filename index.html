@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ideacubator — From idea to funded company</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="refined_design.css">
+  
+  <!-- Firebase SDK (v8 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <div id="navbar-placeholder"></div>  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg">
+      <div class="hero-bg-circle hero-bg-c1"></div>
+      <div class="hero-bg-circle hero-bg-c2"></div>
+      <div class="hero-bg-circle hero-bg-c3"></div>
+    </div>
+    <div class="hero-content container">
+      <div class="hero-eyebrow"><div class="hero-dot"></div><span>Venture Studio · Bangalore, India</span></div>
+      <h1 class="hero-h1">From idea to funded company — <em>we build it with you.</em></h1>
+      <p class="hero-sub">Whether you have a sketch on a napkin or a business already running — we help you take the next step. Capital, a build team, and a clear plan included.</p>
+      <div class="hero-actions">
+        <a href="#apply" class="btn-primary">Tell us your idea <span class="arr">→</span></a>
+        <span class="hero-secondary">or <a href="#invest">looking to invest?</a> · <a href="#" onclick="handleTrackLink(event)">already applied?</a></span>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-val">14d</div><div class="hero-stat-label">Response to every application — no matter what</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">4</div><div class="hero-stat-label">Ways to partner, from first idea to Series A</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">Idea→IPO</div><div class="hero-stat-label">We cover the full journey — not just the cheque</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">India</div><div class="hero-stat-label">Origin. Global investor network across IN, US, SEA</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNEY -->
+  <section id="journey">
+    <div class="journey-bg"></div>
+    <div class="journey-inner container">
+      <div class="journey-header reveal">
+        <div class="section-label">The full journey</div>
+        <h2 class="journey-h2">Where do you enter?</h2>
+        <p class="journey-sub">Every stage has an entry point. Click yours to see what we do there.</p>
+      </div>
+      <div class="stages-rail reveal" id="stages-rail"></div>
+      <div class="journey-detail reveal" id="journey-detail"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT / STUDIO -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-left reveal">
+          <div class="section-label">Who we are</div>
+          <h2 class="about-h2">We're not just a cheque. We're your <em>build partner.</em></h2>
+          <p class="about-p">Most funding firms write you a cheque and step back. We don't. We sit alongside you — bringing our engineering team, business expertise, and investor network to help turn your idea into a real company.</p>
+          <p class="about-p">From your first sketch to your first funding round and beyond — we are involved at every step that matters.</p>
+          <div class="about-pillars">
+            <div class="pillar"><div class="pillar-icon"><svg viewBox="0 0 16 16"><path d="M8 2L14 6v8H2V6L8 2z"/></svg></div><div class="pillar-title">Transparent from day one</div><div class="pillar-desc">Clear agreements protect you as much as us. No surprises, no ambiguity, just a fair deal in writing before we start.</div></div>
+            <div class="pillar"><div class="pillar-icon"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg></div><div class="pillar-title">Execution is everything</div><div class="pillar-desc">Ideas are common. The ability to execute with speed and discipline is not. We assess and support both equally.</div></div>
+            <div class="pillar"><div class="pillar-icon"><svg viewBox="0 0 16 16"><path d="M3 8h10M8 3v10"/></svg></div><div class="pillar-title">Capital with structure</div><div class="pillar-desc">Every investment is paired with a governance framework. Money deployed in stages tied to real milestones.</div></div>
+            <div class="pillar"><div class="pillar-icon"><svg viewBox="0 0 16 16"><path d="M2 8c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6-6-2.7-6-6z"/></svg></div><div class="pillar-title">Flexible by design</div><div class="pillar-desc">We adapt our engagement to the founder's stage, strength, and ambition. No single template — only structured outcomes.</div></div>
+          </div>
+        </div>
+        <div class="about-right reveal">
+          <div class="studio-highlight">
+            <div class="sh-label">Our Studio</div>
+            <h3 class="sh-title">You bring the idea. We bring the team to build it.</h3>
+            <p class="sh-desc">Unlike traditional VCs that only provide capital, our venture studio actively participates in company creation — bringing the team, infrastructure, and execution expertise most founders lack.</p>
+            <ul class="sh-list">
+              <li>Engineering team that builds your product alongside you</li>
+              <li>Product managers who've shipped at scale</li>
+              <li>AI-augmented development for faster MVP delivery</li>
+              <li>Hiring support — technical recruiting and fractional CTO/CFO</li>
+              <li>Investor network across India, US, and Southeast Asia</li>
+            </ul>
+          </div>
+          <div class="studio-vs">
+            <div class="vs-title">Studio vs. traditional VC</div>
+            <table class="vs-table">
+              <thead><tr><th></th><th class="vs-col-us">Ideacubator</th><th>Traditional VC</th></tr></thead>
+              <tbody>
+                <tr><td>Capital</td><td class="vs-check">✓</td><td class="vs-check">✓</td></tr>
+                <tr><td>Product team</td><td class="vs-check">✓</td><td class="vs-cross">✗</td></tr>
+                <tr><td>Tech infrastructure</td><td class="vs-check">✓</td><td class="vs-cross">✗</td></tr>
+                <tr><td>Go-to-market support</td><td class="vs-check">✓</td><td class="vs-cross">✗</td></tr>
+                <tr><td>Hiring & talent</td><td class="vs-check">✓</td><td class="vs-cross">✗</td></tr>
+                <tr><td>Governance & reporting</td><td class="vs-check">✓</td><td class="vs-cross">✗</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section id="proof">
+    <div class="container">
+      <div class="proof-header reveal"><div class="section-label">Meet the team</div><h2 class="proof-h2">People you're actually partnering with</h2></div>
+      <div class="team-grid reveal">
+        <div class="team-card"><div class="team-avatar">AK</div><div class="team-name">Arjun Kapoor</div><div class="team-role">Co-founder · Studio Lead</div><div class="team-bio">Former VP Engineering at a Series B fintech. Built and shipped products used by 4M+ users. Led studio builds for 6 early-stage ventures.</div></div>
+        <div class="team-card"><div class="team-avatar" style="background:var(--accent3)">SR</div><div class="team-name">Sneha Rajan</div><div class="team-role">Co-founder · Investment Lead</div><div class="team-bio">Ex-investment manager at a Bangalore family office. Structured 18 deals across SaaS, D2C, and deep tech. MBA from IIM Ahmedabad.</div></div>
+        <div class="team-card"><div class="team-avatar" style="background:var(--accent4)">VM</div><div class="team-name">Vikram Mehta</div><div class="team-role">Head of Product</div><div class="team-bio">Shipped 3 consumer apps from 0 to 100K users. Previously at Flipkart and a YC-backed startup. Obsessive about founder-market fit.</div></div>
+      </div>
+      <div class="stat-banner reveal">
+        <div class="stat-b-item"><div class="stat-b-val">14d</div><div class="stat-b-label">Maximum response time to every application</div></div>
+        <div class="stat-b-item"><div class="stat-b-val">4</div><div class="stat-b-label">Distinct engagement models for every stage</div></div>
+        <div class="stat-b-item"><div class="stat-b-val">Idea→Exit</div><div class="stat-b-label">Full journey — from first sketch to funding or IPO</div></div>
+        <div class="stat-b-item"><div class="stat-b-val">Bangalore</div><div class="stat-b-label">India-origin studio, global investor network</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="testi-bg"></div>
+    <div class="testi-inner container">
+      <div class="testi-header reveal">
+        <div class="testi-header-left">
+          <div class="testi-label">Founder stories</div>
+          <h2 class="testi-h2">Words from the founders<br>we've <em>worked alongside.</em></h2>
+        </div>
+        <div class="testi-nav">
+          <button class="testi-nav-btn" id="testi-prev" onclick="slideTesti(-1)" aria-label="Previous">‹</button>
+          <button class="testi-nav-btn" id="testi-next" onclick="slideTesti(1)" aria-label="Next">›</button>
+        </div>
+      </div>
+
+      <div class="testi-track-wrap reveal">
+        <div class="testi-track" id="testi-track">
+          <div class="testi-card">
+            <span class="testi-quote-mark">"</span>
+            <div class="testi-text">I came to Ideacubator with a Notion doc and a lot of conviction. Twelve weeks later we had a working product and our first three paying customers. What surprised me most was <strong>how much they pushed back</strong> — they questioned assumptions I hadn't even noticed I was making.</div>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:#e6f1fb;color:#0c447c">AM</div>
+              <div><div class="testi-name">Arjun Mehta</div><div class="testi-role">Founder, CampusKart</div><span class="testi-tag" style="background:#e6f1fb;color:#0c447c">Studio Build</span></div>
+            </div>
+          </div>
+
+          <div class="testi-card">
+            <span class="testi-quote-mark">"</span>
+            <div class="testi-text">I was a PM at a large company. I had the domain knowledge but no technical co-founder and couldn't leave my job. Ideacubator was the only firm that took that seriously. <strong>They built alongside me without making me feel like a passenger in my own startup.</strong></div>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:#d5f0e8;color:#085041">PK</div>
+              <div><div class="testi-name">Priya Krishnamurthy</div><div class="testi-role">Founder, HRPulse</div><span class="testi-tag" style="background:#d5f0e8;color:#085041">Validation Sprint</span></div>
+            </div>
+          </div>
+
+          <div class="testi-card">
+            <span class="testi-quote-mark">"</span>
+            <div class="testi-text">The due diligence process was intense — but that's exactly what you want from a partner. They found gaps in our financial model that our auditors had missed. By the time we closed the round, <strong>we were genuinely better prepared</strong> than we would have been with any other firm.</div>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:#eeedfe;color:#26215c">RD</div>
+              <div><div class="testi-name">Rohan Desai</div><div class="testi-role">Co-founder, TraceIQ</div><span class="testi-tag" style="background:#eeedfe;color:#26215c">Seed funding</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-dots reveal" id="testi-dots"></div>
+
+      <div class="testi-pull reveal">
+        <div class="testi-pull-q">"The best thing about working with Ideacubator isn't the capital. It's that <em>they stay in the room</em> — through the hard decisions, the pivots, and the moments when you need someone to tell you the truth."</div>
+        <div class="testi-pull-attr">— Composite of feedback from our founders · 2024–2026</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATHS -->
+  <section id="paths">
+    <div class="container">
+      <div class="paths-header reveal">
+        <div class="section-label">Four ways to partner</div>
+        <h2 class="paths-h2">Find your path</h2>
+        <p class="paths-sub">Each model is built for a specific situation. Not sure which fits? Answer two questions.</p>
+      </div>
+      <div class="router reveal">
+        <div class="router-q">Not sure which model is right for you?</div>
+        <div style="margin-bottom:12px"><div style="font-size:12px;color:var(--ink3);margin-bottom:8px;font-weight:500">Do you have a working product?</div><div class="router-options" id="q1"><button class="router-btn" onclick="routerQ(1,'no',this)">No — it's an idea</button><button class="router-btn" onclick="routerQ(1,'yes',this)">Yes — it's built</button></div></div>
+        <div id="q2-wrap" style="display:none"><div style="font-size:12px;color:var(--ink3);margin-bottom:8px;font-weight:500">Do you have a team to build it?</div><div class="router-options" id="q2"><button class="router-btn" onclick="routerQ(2,'no',this)">No — I need builders</button><button class="router-btn" onclick="routerQ(2,'yes',this)">Yes — I have a team</button></div></div>
+        <div class="router-result" id="router-result"></div>
+      </div>
+      <div class="models-grid reveal">
+        <div class="model-card" id="m-studio" style="border-top:3px solid var(--purp)"><div class="model-tag"><span class="pill pill-purp">Most popular</span></div><div class="model-num">Model 01</div><h3 class="model-title">Studio Build</h3><p class="model-plain">"I have an idea — you build it with me"</p><ul class="model-list"><li>Our engineering team co-builds your product from scratch</li><li>AI-augmented development for faster MVP delivery</li><li>Shared equity with vesting milestones — both sides committed</li><li>Sprint-based delivery, joint review every two weeks</li><li>IP ownership clearly defined before we start</li></ul><div class="model-footer">Best for: college students, corporate professionals, idea-stage founders</div></div>
+        <div class="model-card" id="m-sprint" style="border-top:3px solid var(--teal)"><div class="model-num">Model 02</div><h3 class="model-title">Validation Sprint</h3><p class="model-plain">"Test my idea before committing"</p><ul class="model-list"><li>8–12 week structured sprint before any capital commitment</li><li>Real customer conversations, market testing, feasibility check</li><li>Clear go / no-go decision at the end — based on evidence</li><li>Full investment available if validation criteria are met</li><li>No surprises — criteria agreed before the sprint begins</li></ul><div class="model-footer">Best for: cautious founders, corporate innovation teams, market testers</div></div>
+        <div class="model-card" id="m-founder" style="border-top:3px solid var(--amber)"><div class="model-num">Model 03</div><h3 class="model-title">Founder-Led Investment</h3><p class="model-plain">"Fund my business — I keep control"</p><ul class="model-list"><li>Minority equity stake — you retain full operational control</li><li>Milestone-based capital — money released as you hit goals</li><li>Quarterly reviews with defined KPIs — no surprises policy</li><li>No board seat unless mutually agreed after Series A</li><li>Governance and reporting framework defined upfront</li></ul><div class="model-footer">Best for: MVP-stage founders, entrepreneurs with traction</div></div>
+        <div class="model-card" id="m-partner" style="border-top:3px solid var(--blue)"><div class="model-num">Model 04</div><h3 class="model-title">Venture Partnership</h3><p class="model-plain">"Fund and scale together — as full partners"</p><ul class="model-list"><li>Capital investment with active strategic involvement</li><li>Defined board structure agreed before engagement</li><li>18-month scaling roadmap with measurable milestones</li><li>Network access: hiring support, market entry guidance</li><li>Monthly operational and quarterly board reviews</li></ul><div class="model-footer">Best for: revenue-stage founders ready to scale seriously</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT WE LOOK FOR -->
+  <section id="lookfor">
+    <div class="lookfor-bg"></div>
+    <div class="lookfor-inner container">
+      <div class="reveal">
+        <div class="lookfor-label">What we look for</div>
+        <h2 class="lookfor-h2">We're honest about what matters to us.</h2>
+        <p class="lookfor-bridge">Not because we're selective for its own sake — but because the right fit makes everything easier for both of us.</p>
+      </div>
+      <div class="criteria-grid reveal">
+        <div class="criterion"><div class="criterion-q">"Can you explain your idea clearly — without buzzwords?"</div><div class="criterion-title">Clarity of thinking</div></div>
+        <div class="criterion"><div class="criterion-q">"Do you understand the problem at a deep level — not just surface symptoms?"</div><div class="criterion-title">Problem insight</div></div>
+        <div class="criterion"><div class="criterion-q">"Do you disclose risks openly? We do reference checks."</div><div class="criterion-title">Integrity</div></div>
+        <div class="criterion"><div class="criterion-q">"Are you all in — or testing the waters from a safe distance?"</div><div class="criterion-title">Commitment</div></div>
+        <div class="criterion"><div class="criterion-q">"How fast do you move — in product, in learning, in pivoting?"</div><div class="criterion-title">Execution speed</div></div>
+        <div class="criterion"><div class="criterion-q">"Are you open to feedback, even when it's uncomfortable?"</div><div class="criterion-title">Coachability</div></div>
+        <div class="criterion" style="grid-column:1/-1"><div class="criterion-q">"Do you know who your customers are — and why they'd pay?"</div><div class="criterion-title">Market realism</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVESTMENT FOCUS -->
+  <section id="focus">
+    <div class="container">
+      <div class="focus-header reveal"><div class="section-label">Investment focus</div><h2 class="focus-h2">The kinds of ideas we back</h2><p class="focus-sub">We focus where technology genuinely changes how something works — not just makes it slightly faster.</p></div>
+      <div class="focus-grid reveal">
+        <div class="focus-card"><div class="focus-card-title">AI-powered products</div><div class="focus-plain">Where AI does the real work, not just answers questions</div><div class="focus-desc">Products where AI is the core — not a feature bolted onto an existing solution.</div><span class="focus-expand" onclick="toggleDetail(this)">More detail ↓</span><div class="focus-detail">Products where AI is a core architectural layer — the AI must be doing the work that makes the product defensible.</div></div>
+        <div class="focus-card"><div class="focus-card-title">Industry-specific software</div><div class="focus-plain">Tools that solve real problems for businesses in specific sectors</div><div class="focus-desc">B2B software built for industries underserved by generic tools — particularly regulated sectors.</div><span class="focus-expand" onclick="toggleDetail(this)">More detail ↓</span><div class="focus-detail">Vertical SaaS targeting underserved enterprise workflows, particularly in regulated industries like healthcare, logistics, finance, and manufacturing.</div></div>
+        <div class="focus-card"><div class="focus-card-title">Hard-to-copy technology</div><div class="focus-plain">Things competitors can't build in a weekend</div><div class="focus-desc">Technology with a genuine moat — built on research, unique data, or engineering depth.</div><span class="focus-expand" onclick="toggleDetail(this)">More detail ↓</span><div class="focus-detail">Defensible technology built on research, proprietary data, or hard engineering. The kind that takes years to replicate — not months.</div></div>
+        <div class="focus-card"><div class="focus-card-title">Automation & productivity</div><div class="focus-plain">Making work faster without adding another app</div><div class="focus-desc">Workflow automation, intelligent process execution, and human-AI collaboration tools.</div><span class="focus-expand" onclick="toggleDetail(this)">More detail ↓</span><div class="focus-detail">Workflow automation and human-AI collaboration tools that meaningfully reduce effort — not just digitise an existing form.</div></div>
+        <div class="focus-card"><div class="focus-card-title">Foundational infrastructure</div><div class="focus-plain">Platforms that other businesses depend on</div><div class="focus-desc">Data pipelines, API ecosystems, and platforms that enable other companies to operate better.</div><span class="focus-expand" onclick="toggleDetail(this)">More detail ↓</span><div class="focus-detail">Scalable infrastructure platforms — data pipelines, API ecosystems — that other businesses build on top of. High switching cost, recurring revenue.</div></div>
+        <div class="focus-card"><div class="focus-card-title">India + global reach</div><div class="focus-plain">India-built ideas with global ambition — or global brands entering India</div><div class="focus-desc">We back India-origin businesses with global reach, and global businesses targeting India's growing market.</div><span class="focus-expand" onclick="toggleDetail(this)">More detail ↓</span><div class="focus-detail">India-origin businesses with global reach potential, and global businesses targeting India. Active networks in US, SEA, and the Gulf to support both directions.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <div class="container">
+      <div class="reveal"><div class="section-label">How we work</div><h2 class="process-h2">What happens after you apply — a clear, honest process</h2><p class="process-sub">Our process reaches a clear decision within a defined timeframe. Transparency and speed are commitments — not bonuses.</p></div>
+      <div class="steps reveal">
+        <div class="step"><div class="step-left"><div class="step-circle">01</div></div><div class="step-body"><div class="step-title">Application review</div><div class="step-desc">Every application is reviewed by a real person. You will receive a response regardless of outcome. If we're not the right fit, we'll tell you clearly and explain why.</div><div class="step-time">Within 14 business days</div></div></div>
+        <div class="step"><div class="step-left"><div class="step-circle">02</div></div><div class="step-body"><div class="step-title">Screening conversation</div><div class="step-desc">A 45-minute structured conversation. We assess the founder directly — not through the pitch deck. We ask honest questions and expect honest answers.</div><div class="step-time">45 minutes</div></div></div>
+        <div class="step"><div class="step-left"><div class="step-circle">03</div></div><div class="step-body"><div class="step-title">Technical & commercial assessment</div><div class="step-desc">Product review, market analysis, financial model scrutiny, and reference conversations. We go deep — so that when we say yes, we mean it fully.</div><div class="step-time">1–2 weeks</div></div></div>
+        <div class="step"><div class="step-left"><div class="step-circle">04</div></div><div class="step-body"><div class="step-title">Validation sprint <span style="font-size:12px;color:var(--ink3);font-weight:400">(early stage only)</span></div><div class="step-desc">For early-stage applications: a structured 8–12 week sprint before committing capital. Market testing, customer discovery, and feasibility assessment — with measurable criteria agreed upfront.</div><div class="step-time">8–12 weeks</div></div></div>
+        <div class="step"><div class="step-left"><div class="step-circle">05</div></div><div class="step-body"><div class="step-title">Investment committee decision</div><div class="step-desc">Decision communicated within 5 business days of our committee meeting — with clear rationale. We don't ghost. We give you a real answer.</div><div class="step-time">Within 5 business days</div></div></div>
+        <div class="step"><div class="step-left"><div class="step-circle">06</div></div><div class="step-body"><div class="step-title">Structured onboarding</div><div class="step-desc">A 4-week onboarding: governance setup, reporting cadence, milestone documentation, and team integration. We start building on day one.</div><div class="step-time">4 weeks</div><div class="honesty-note">If we don't think we're the right fit after any stage, we'll tell you clearly and explain why. You'll never be left wondering — and we'll always point you toward what might serve you better.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLY -->
+  <section id="apply">
+    <div class="container">
+      <div class="apply-inner">
+        <div class="apply-label reveal">Apply now</div>
+        <h2 class="apply-h2 reveal">If you've read this far, you're already thinking seriously.</h2>
+        <p class="apply-sub reveal">That's a good sign. Tell us where you are and what you're building — we'll take it from here.</p>
+
+        <!-- Auth gate -->
+        <div class="auth-gate reveal" id="auth-gate">
+          <div class="auth-gate-icon">🔒</div>
+          <div class="auth-gate-title">Create your account to apply</div>
+          <div class="auth-gate-sub">Sign in with Google to submit your application and track its progress in your personal dashboard. Takes 10 seconds.</div>
+          <button class="btn-google-dark" onclick="openAuthModal('apply')">
+            <svg style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+          <div style="font-size:12px;color:rgba(255,255,255,.3);margin-top:12px">Already applied? <a href="#" onclick="openAuthModal('dashboard'); return false;" style="color:#fff; text-decoration:underline">Sign in to your dashboard</a></div>
+          <div style="font-size:11px;color:rgba(255,255,255,.2);margin-top:8px">Your information is used only to process your application and send you updates.</div>
+        </div>
+
+        <!-- Application form -->
+        <div class="apply-form" id="apply-form">
+          <div id="apply-form-body">
+            <div class="apply-user-bar" id="apply-user-bar"></div>
+            <div id="apply-global-err"></div>
+            <label class="form-label" for="profile-select">Where are you right now? <span class="req">*</span></label>
+            <select class="form-select" id="profile-select" onchange="loadForm(this.value)">
+              <option value="">Choose your situation...</option>
+              <option value="student">I'm a student with a startup idea</option>
+              <option value="professional">I have an idea but need someone to build it (I stay employed)</option>
+              <option value="seed">I've built a product and I'm ready to raise funding</option>
+              <option value="vc">My business is making money and I'm ready to scale</option>
+              <option value="sell">I want to sell my business</option>
+              <option value="ipo">I want to take my company public</option>
+              <option value="test">I want to test my idea before a big commitment</option>
+              <option value="value">I need my business valued</option>
+              <option value="intl-out">I want to expand my Indian business internationally</option>
+              <option value="intl-in">I'm an international business seeking an India partner</option>
+            </select>
+            <div id="profile-select-err" class="form-field-err">Please select your situation to continue.</div>
+            <div class="form-fields" id="form-fields"></div>
+            <div class="form-consent" id="form-consent" style="display:none">
+              <input type="checkbox" id="consent" onchange="validateConsent()">
+              <label class="form-consent-label" for="consent">I confirm my information is accurate and I agree to Ideacubator's <a href="#">Terms of Engagement</a> and <a href="#">Privacy Policy</a>.</label>
+            </div>
+            <div id="consent-err" class="form-field-err">Please confirm you agree to the Terms before submitting.</div>
+            <button class="btn-submit" id="btn-submit" onclick="submitForm()" style="display:none" disabled>Submit my application →</button>
+            <div class="form-assurance" id="form-assurance" style="display:none">You'll hear from us within 14 business days — no matter what. Every application gets a real response.</div>
+          </div>
+          <div class="form-success" id="form-success">
+            <div class="fs-icon">✓</div>
+            <div class="fs-title">Application received.</div>
+            <div class="fs-desc">Thank you. We'll review your application and respond within 14 business days — regardless of outcome.</div>
+            <button class="fs-dash" onclick="window.location.href='/dashboard/founder.html'">View in your dashboard →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVEST -->
+  <section id="invest" style="background: var(--paper); padding: 100px 0; border-top: 1px solid var(--border);">
+    <div class="container">
+      <div class="row" style="display: flex; flex-wrap: wrap; gap: 60px; align-items: flex-start;">
+        <div style="flex: 1; min-width: 300px;" class="reveal">
+          <div class="section-label">Investor Network</div>
+          <h1 class="invest-h1">Join our circle of <em>strategic capital.</em></h1>
+          <p class="invest-desc">We curate high-potential deal flow for HNIs, family offices, and institutional investors. Our focus is on disciplined execution and transparent governance.</p>
+          
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div style="display: flex; gap: 16px;">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--paper2); display: flex; align-items: center; justify-content: center; font-size: 18px;">🎯</div>
+              <div><div style="font-weight: 500; font-size: 14px;">Curated Deal Flow</div><div style="font-size: 13px; color: var(--ink3);">Only the ventures that pass our 100-day alignment filter.</div></div>
+            </div>
+            <div style="display: flex; gap: 16px;">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--paper2); display: flex; align-items: center; justify-content: center; font-size: 18px;">⚖️</div>
+              <div><div style="font-weight: 500; font-size: 14px;">Governance First</div><div style="font-size: 13px; color: var(--ink3);">Structured tranches and monthly operational reporting.</div></div>
+            </div>
+            <div style="display: flex; gap: 16px;">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--paper2); display: flex; align-items: center; justify-content: center; font-size: 18px;">🚀</div>
+              <div><div style="font-weight: 500; font-size: 14px;">Co-Execution</div><div style="font-size: 13px; color: var(--ink3);">We don't just find founders; we build with them.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex: 1.2; min-width: 320px;" class="reveal">
+          <div class="invest-card">
+            <span class="form-section-label">Investment Profile</span>
+            <form id="investorForm">
+              <div class="form-group">
+                <label class="form-label light" for="inv-name">Your Full Name <span class="req">*</span></label>
+                <input type="text" id="inv-name" class="form-input light" placeholder="Arjun Mehta" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label light" for="inv-email">Email Address <span class="req">*</span></label>
+                <input type="email" id="inv-email" class="form-input light" placeholder="arjun@company.in" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label light" for="inv-type">Investment Capacity <span class="req">*</span></label>
+                <select id="inv-type" class="form-select light" required>
+                  <option value="">Select range...</option>
+                  <option value="5-10L">₹5L - ₹10L</option>
+                  <option value="10-50L">₹10L - ₹50L</option>
+                  <option value="50L-1Cr">₹50L - ₹1Cr</option>
+                  <option value="1Cr+">₹1Cr+</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label light" for="inv-linkedin">LinkedIn Profile <span class="opt">(Optional)</span></label>
+                <input type="url" id="inv-linkedin" class="form-input light" placeholder="https://linkedin.com/in/...">
+              </div>
+              <div class="form-group">
+                <label class="form-label light" for="inv-sectors">Sectors of Interest <span class="req">*</span></label>
+                <input type="text" id="inv-sectors" class="form-input light" placeholder="e.g. Fintech, AI, SaaS" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label light" for="inv-message">Notes or specific requirements <span class="opt">(Optional)</span></label>
+                <textarea id="inv-message" class="form-textarea light" style="min-height: 80px;" placeholder="Tell us a bit about your investment thesis..."></textarea>
+              </div>
+
+              <div style="margin-bottom: 32px;">
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                  <input type="checkbox" id="newsletter" checked style="margin-top: 4px;">
+                  <label style="font-size: 13px; color: var(--ink2); cursor: pointer;" for="newsletter">
+                    I would like to receive curated deal-flow updates and monthly reports.
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Register Interest →</button>
+            </form>
+
+            <div id="invest-success" style="display: none; text-align: center; padding: 20px 0;">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px;">✓</div>
+              <h3 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: 12px;">Interest Registered.</h3>
+              <p style="font-size: 14px; color: var(--ink2); line-height: 1.6;">Thank you. Our investment relations team will review your profile and reach out within 3 business days.</p>
+              <button class="btn-primary" style="margin-top: 24px; background: none; color: var(--accent); border: 1px solid var(--accent); padding: 10px 20px;" onclick="location.reload()">Back to form</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo">Idea<span>cubator</span></div>
+          <p style="font-size: 14px; color: var(--ink3); line-height: 1.6; max-width: 240px;">From idea to funded company — we build it with you.</p>
+        </div>
+        
+        <div class="footer-contact">
+          <div class="footer-contact-title">Office</div>
+          <div class="footer-address">
+            <strong>Address:</strong><br>
+            18th Floor, SKAV 909,<br>
+            9/1, Lavelle Road,<br>
+            Sampangi Rama Nagar,<br>
+            Ashok Nagar,<br>
+            Bengaluru, Karnataka 560001,<br>
+            India
+          </div>
+          <div class="footer-contact-item">
+            <span>📞</span> +91 9108873817
+          </div>
+          <div class="footer-contact-item">
+            <span>✉️</span> contact@ideacubator.in
+          </div>
+        </div>
+
+        <div class="footer-navigation">
+          <div class="footer-links-title">Quick Links</div>
+          <div class="footer-links">
+            <a href="#hero">Home</a>
+            <a href="#about">About Studio</a>
+            <a href="#paths">Partner Models</a>
+            <a href="#invest">Invest</a>
+            <a href="#apply">Apply Now</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div>© 2026 Ideacubator. All rights reserved.</div>
+        <div style="display: flex; gap: 20px;">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Engagement</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="refined_logic.js"></script>
+  <script>
+    // Load Navbar
+    fetch('navbar.html')
+      .then(r => r.text())
+      .then(h => {
+        document.getElementById('navbar-placeholder').innerHTML = h;
+        initNav();
+      })
+      .catch(err => console.error('Error loading navbar:', err));
+  </script>
+</body>
+</html>
