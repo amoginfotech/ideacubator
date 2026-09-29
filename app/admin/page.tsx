@@ -40,8 +40,54 @@ const STAGE_LABELS: Record<number, string> = {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   received: { label: 'Received', color: 'var(--amber)', bg: 'var(--amber-soft)' },
   under_review: { label: 'Under Review', color: '#1d4ed8', bg: '#dbeafe' },
+  meeting_scheduled: { label: 'Meeting Scheduled', color: '#7c3aed', bg: '#ede9fe' },
   approved: { label: 'Approved', color: 'var(--green)', bg: 'var(--green-soft)' },
   deferred: { label: 'Deferred', color: 'var(--ink-3)', bg: 'var(--paper-2)' }
+};
+
+const getDocTimestamp = (app: any): number => {
+  const t = app?.metadata?.createdAt || app?.submittedAt || app?.createdAt || app?.timestamp;
+  if (!t) return 0;
+  if (typeof t.toMillis === 'function') return t.toMillis();
+  if (t.seconds) return t.seconds * 1000;
+  if (typeof t === 'number') return t;
+  if (typeof t === 'string') return new Date(t).getTime() || 0;
+  return 0;
+};
+
+const normalizeStatus = (status?: string): string => {
+  const s = (status || '').toLowerCase().trim();
+  if (!s || s === 'new' || s === 'submitted') return 'received';
+  return s;
+};
+
+const formatAppDate = (app: any): string => {
+  const ms = getDocTimestamp(app);
+  if (!ms) return 'Recent';
+  return new Date(ms).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
+
+const getAppDocuments = (app: any): Array<{ name: string; size?: number; downloadUrl: string }> => {
+  if (!app) return [];
+  if (Array.isArray(app.documents) && app.documents.length > 0) {
+    return app.documents.map((d: any) => ({
+      name: d.name || 'Pitch Deck',
+      size: d.size,
+      downloadUrl: d.downloadUrl || d.url || '#'
+    }));
+  }
+  if (app.pitchDeck && typeof app.pitchDeck === 'object') {
+    return [{
+      name: app.pitchDeck.name || 'Pitch Deck',
+      size: app.pitchDeck.size,
+      downloadUrl: app.pitchDeck.downloadUrl || app.pitchDeck.url || '#'
+    }];
+  }
+  return [];
 };
 
 type DrawerTab = 'founder' | 'idea' | 'chat' | 'meeting';
@@ -132,16 +178,16 @@ export default function AdminPage() {
     }
   };
 
-  // 1. Applications Listener
+  // 1. Applications Listener (Retrieves all ventures, sorting client-side across all timestamp formats)
   useEffect(() => {
     if (!isAdmin) return;
 
-    const q = query(collection(db, 'applications'), orderBy('metadata.createdAt', 'desc'));
     const unsub = onSnapshot(
-      q,
+      collection(db, 'applications'),
       (snapshot) => {
         const apps: any[] = [];
         snapshot.forEach((d) => apps.push({ id: d.id, ...d.data() }));
+        apps.sort((a, b) => getDocTimestamp(b) - getDocTimestamp(a));
         setApplications(apps);
         if (selectedApp) {
           const fresh = apps.find((a) => a.id === selectedApp.id);
@@ -389,10 +435,10 @@ export default function AdminPage() {
     }
   };
 
-  // Filter & Sort Logic
+  // Filter & Sort Logic (handles both legacy and new intake schemas)
   const filteredApps = applications.filter((app) => {
     const title = (app.idea?.title || app.title || app.ideaName || '').toLowerCase();
-    const founder = (app.founderName || app.profile?.fullName || '').toLowerCase();
+    const founder = (app.founderName || app.profile?.fullName || app.name || '').toLowerCase();
     const email = (app.founderEmail || app.email || app.profile?.email || '').toLowerCase();
     const search = filterSearch.toLowerCase().trim();
 
@@ -400,13 +446,14 @@ export default function AdminPage() {
       return false;
     }
 
+    const appStatus = normalizeStatus(app.status || app.metadata?.status);
+    const appStage = Number(app.stage || (appStatus === 'approved' ? 2 : 1));
+
     if (filterStage !== 'all') {
-      const appStage = String(app.stage || 1);
-      if (appStage !== filterStage) return false;
+      if (String(appStage) !== filterStage) return false;
     }
 
     if (filterStatus !== 'all') {
-      const appStatus = (app.status || app.metadata?.status || 'received').toLowerCase();
       if (appStatus !== filterStatus) return false;
     }
 
@@ -416,24 +463,24 @@ export default function AdminPage() {
   // Sort
   filteredApps.sort((a, b) => {
     if (sortBy === 'date_desc') {
-      const tA = a.metadata?.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
-      const tB = b.metadata?.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
-      return tB - tA;
+      return getDocTimestamp(b) - getDocTimestamp(a);
     }
     if (sortBy === 'date_asc') {
-      const tA = a.metadata?.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
-      const tB = b.metadata?.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
-      return tA - tB;
+      return getDocTimestamp(a) - getDocTimestamp(b);
     }
     if (sortBy === 'stage_desc') {
-      return (b.stage || 1) - (a.stage || 1);
+      const sA = a.stage || (normalizeStatus(a.status) === 'approved' ? 2 : 1);
+      const sB = b.stage || (normalizeStatus(b.status) === 'approved' ? 2 : 1);
+      return sB - sA;
     }
     if (sortBy === 'stage_asc') {
-      return (a.stage || 1) - (b.stage || 1);
+      const sA = a.stage || (normalizeStatus(a.status) === 'approved' ? 2 : 1);
+      const sB = b.stage || (normalizeStatus(b.status) === 'approved' ? 2 : 1);
+      return sA - sB;
     }
     if (sortBy === 'name_asc') {
-      const nA = (a.founderName || a.idea?.title || '').toLowerCase();
-      const nB = (b.founderName || b.idea?.title || '').toLowerCase();
+      const nA = (a.founderName || a.profile?.fullName || a.idea?.title || a.ideaName || '').toLowerCase();
+      const nB = (b.founderName || b.profile?.fullName || b.idea?.title || b.ideaName || '').toLowerCase();
       return nA.localeCompare(nB);
     }
     return 0;
@@ -441,8 +488,8 @@ export default function AdminPage() {
 
   // Stage Metrics Calculations
   const countTotal = applications.length;
-  const countStage1 = applications.filter((a) => (a.stage || 1) === 1).length;
-  const countStage2 = applications.filter((a) => a.stage === 2).length;
+  const countStage1 = applications.filter((a) => (a.stage || (normalizeStatus(a.status) === 'approved' ? 2 : 1)) === 1).length;
+  const countStage2 = applications.filter((a) => (a.stage || (normalizeStatus(a.status) === 'approved' ? 2 : 1)) === 2).length;
   const countStage3 = applications.filter((a) => a.stage === 3).length;
   const countStage4 = applications.filter((a) => a.stage === 4).length;
   const countStage5 = applications.filter((a) => a.stage === 5).length;
@@ -703,45 +750,23 @@ export default function AdminPage() {
               <span className="badge" style={{ fontSize: '10px' }}>{allMessages.length}</span>
             </button>
 
-            <div className="divider" style={{ margin: '18px 0' }} />
-
-            <div style={{ marginBottom: '10px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)' }}>
-              Stage Quick Filter
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <button
-                type="button"
-                className={`side-link ${filterStage === 'all' ? 'active' : ''}`}
-                onClick={() => { setFilterStage('all'); setActiveTab('ideas'); }}
-                style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '12px', padding: '6px 10px' }}
-              >
-                All Stages ({applications.length})
-              </button>
-              <button
-                type="button"
-                className={`side-link ${filterStage === '1' ? 'active' : ''}`}
-                onClick={() => { setFilterStage('1'); setActiveTab('ideas'); }}
-                style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '12px', padding: '6px 10px' }}
-              >
-                Phase 01 Diligence ({countStage1})
-              </button>
-              <button
-                type="button"
-                className={`side-link ${filterStage === '2' ? 'active' : ''}`}
-                onClick={() => { setFilterStage('2'); setActiveTab('ideas'); }}
-                style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '12px', padding: '6px 10px' }}
-              >
-                Phase 02 Validation ({countStage2})
-              </button>
-              <button
-                type="button"
-                className={`side-link ${filterStage === '3' ? 'active' : ''}`}
-                onClick={() => { setFilterStage('3'); setActiveTab('ideas'); }}
-                style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '12px', padding: '6px 10px' }}
-              >
-                Phase 03 Build ({countStage3})
-              </button>
+            {/* Quick Filter Info in Sidebar */}
+            <div style={{ padding: '12px 14px', background: 'var(--paper)', borderRadius: '10px', border: '1px solid var(--line)', marginTop: '8px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)', marginBottom: '8px' }}>
+                Pipeline Summary
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '4px 0' }}>
+                <span style={{ color: 'var(--ink-2)' }}>Total Intake</span>
+                <strong>{countTotal}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '4px 0' }}>
+                <span style={{ color: 'var(--amber)' }}>Phase 01 Diligence</span>
+                <strong>{countStage1}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '4px 0' }}>
+                <span style={{ color: '#2563eb' }}>Phase 02 Validated</span>
+                <strong>{countStage2}</strong>
+              </div>
             </div>
           </aside>
 
@@ -752,42 +777,63 @@ export default function AdminPage() {
             ════════════════════════════════════════════════════════ */}
             {activeTab === 'ideas' && (
               <div className="card pad" style={{ padding: '20px' }}>
-                {/* FILTER & SEARCH TOOLBAR */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                  <div style={{ flex: '1 1 260px', minWidth: '220px' }}>
-                    <input
-                      type="text"
-                      placeholder="🔍 Search by founder name, email, or venture..."
-                      value={filterSearch}
-                      onChange={(e) => setFilterSearch(e.target.value)}
-                      style={{ width: '100%', padding: '9px 14px', fontSize: '13px' }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                {/* STANDARD TABLE TOOLBAR: FILTERS ON LEFT IN ONE ROW, SEARCH ON TOP RIGHT */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                    paddingBottom: '16px',
+                    borderBottom: '1px solid var(--line)',
+                    marginBottom: '14px'
+                  }}
+                >
+                  {/* LEFT: COMPACT FILTERS IN ONE HORIZONTAL ROW */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     {/* Stage Filter */}
                     <select
                       value={filterStage}
                       onChange={(e) => setFilterStage(e.target.value)}
-                      style={{ padding: '8px 12px', fontSize: '12px', borderRadius: '8px' }}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--line)',
+                        background: 'var(--paper)',
+                        color: 'var(--ink)',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
                     >
-                      <option value="all">All Stages</option>
-                      <option value="1">Phase 01 Diligence</option>
-                      <option value="2">Phase 02 Validation</option>
-                      <option value="3">Phase 03 Prototype/MVP</option>
-                      <option value="4">Phase 04 Traction</option>
-                      <option value="5">Phase 05 Scale &amp; GTM</option>
+                      <option value="all">Stage: All Phases</option>
+                      <option value="1">Phase 01 — Diligence</option>
+                      <option value="2">Phase 02 — Validation</option>
+                      <option value="3">Phase 03 — MVP Build</option>
+                      <option value="4">Phase 04 — Traction</option>
+                      <option value="5">Phase 05 — Scale &amp; GTM</option>
                     </select>
 
                     {/* Status Filter */}
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      style={{ padding: '8px 12px', fontSize: '12px', borderRadius: '8px' }}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--line)',
+                        background: 'var(--paper)',
+                        color: 'var(--ink)',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
                     >
-                      <option value="all">All Statuses</option>
-                      <option value="received">Received</option>
+                      <option value="all">Status: All Statuses</option>
+                      <option value="received">Received / New</option>
                       <option value="under_review">Under Review</option>
+                      <option value="meeting_scheduled">Meeting Scheduled</option>
                       <option value="approved">Approved</option>
                       <option value="deferred">Deferred</option>
                     </select>
@@ -796,32 +842,105 @@ export default function AdminPage() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      style={{ padding: '8px 12px', fontSize: '12px', borderRadius: '8px' }}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--line)',
+                        background: 'var(--paper)',
+                        color: 'var(--ink)',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
                     >
-                      <option value="date_desc">Newest First</option>
-                      <option value="date_asc">Oldest First</option>
-                      <option value="stage_desc">Stage (High → Low)</option>
-                      <option value="stage_asc">Stage (Low → High)</option>
-                      <option value="name_asc">Founder Name (A → Z)</option>
+                      <option value="date_desc">Sort: Newest First</option>
+                      <option value="date_asc">Sort: Oldest First</option>
+                      <option value="stage_desc">Sort: Stage (High → Low)</option>
+                      <option value="stage_asc">Sort: Stage (Low → High)</option>
+                      <option value="name_asc">Sort: Founder Name (A → Z)</option>
                     </select>
+
+                    {/* Clear Filters Reset */}
+                    {(filterSearch || filterStage !== 'all' || filterStatus !== 'all') && (
+                      <button
+                        type="button"
+                        onClick={() => { setFilterSearch(''); setFilterStage('all'); setFilterStatus('all'); }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--brown)',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          padding: '4px 8px',
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        ✕ Clear Filters
+                      </button>
+                    )}
+                  </div>
+
+                  {/* RIGHT: SEARCH BAR POSITIONED IN TOP RIGHT OF TABLE */}
+                  <div style={{ position: 'relative', width: '280px', maxWidth: '100%' }}>
+                    <span
+                      style={{
+                        position: 'absolute',
+                        left: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        fontSize: '13px',
+                        color: 'var(--ink-3)',
+                        pointerEvents: 'none'
+                      }}
+                    >
+                      🔍
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Search ventures or founders..."
+                      value={filterSearch}
+                      onChange={(e) => setFilterSearch(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '7px 12px 7px 32px',
+                        fontSize: '12.5px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--line)',
+                        background: 'var(--paper)',
+                        color: 'var(--ink)'
+                      }}
+                    />
+                    {filterSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setFilterSearch('')}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: 'var(--ink-3)',
+                          fontSize: '11px',
+                          padding: '2px 4px'
+                        }}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 </div>
 
+                {/* TABLE COUNTER BAR */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', fontSize: '12px', color: 'var(--ink-3)' }}>
                   <span>
                     Showing <strong>{filteredApps.length}</strong> of {applications.length} ventures
-                    {filterStage !== 'all' && ` · Stage ${filterStage}`}
-                    {filterStatus !== 'all' && ` · Status: ${filterStatus}`}
+                    {filterStage !== 'all' && ` · Phase 0${filterStage}`}
+                    {filterStatus !== 'all' && ` · ${(STATUS_CONFIG[filterStatus] || {}).label || filterStatus}`}
                   </span>
-                  {(filterSearch || filterStage !== 'all' || filterStatus !== 'all') && (
-                    <button
-                      type="button"
-                      onClick={() => { setFilterSearch(''); setFilterStage('all'); setFilterStatus('all'); }}
-                      style={{ background: 'none', border: 'none', color: 'var(--brown)', cursor: 'pointer', fontSize: '12px', textDecoration: 'underline' }}
-                    >
-                      Reset filters
-                    </button>
-                  )}
                 </div>
 
                 {/* DATA TABLE */}
@@ -832,7 +951,7 @@ export default function AdminPage() {
                         <tr style={{ borderBottom: '1px solid var(--line)', textAlign: 'left', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--ink-3)' }}>
                           <th style={{ padding: '12px 14px' }}>Founder</th>
                           <th style={{ padding: '12px 14px' }}>Venture &amp; Concept</th>
-                          <th style={{ padding: '12px 14px' }}>Materials</th>
+                          <th style={{ padding: '12px 14px' }}>Deck</th>
                           <th style={{ padding: '12px 14px' }}>Stage</th>
                           <th style={{ padding: '12px 14px' }}>Status</th>
                           <th style={{ padding: '12px 14px' }}>Submitted</th>
@@ -841,12 +960,12 @@ export default function AdminPage() {
                       </thead>
                       <tbody>
                         {filteredApps.map((app) => {
-                          const statusKey = (app.status || app.metadata?.status || 'received').toLowerCase();
+                          const statusKey = normalizeStatus(app.status || app.metadata?.status);
                           const statusConf = STATUS_CONFIG[statusKey] || STATUS_CONFIG.received;
-                          const docsCount = Array.isArray(app.documents) ? app.documents.length : 0;
-                          const submittedDate = app.metadata?.createdAt?.seconds
-                            ? new Date(app.metadata.createdAt.seconds * 1000).toLocaleDateString()
-                            : (app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Recent');
+                          const docs = getAppDocuments(app);
+                          const docsCount = docs.length;
+                          const submittedDate = formatAppDate(app);
+                          const stageNum = Number(app.stage || (statusKey === 'approved' ? 2 : 1));
 
                           return (
                             <tr
@@ -861,10 +980,10 @@ export default function AdminPage() {
                               {/* FOUNDER */}
                               <td style={{ padding: '12px 14px' }}>
                                 <strong style={{ fontSize: '13px', display: 'block', color: 'var(--ink)' }}>
-                                  {app.founderName || app.profile?.fullName || 'Anonymous Founder'}
+                                  {app.founderName || app.profile?.fullName || app.name || 'Anonymous Founder'}
                                 </strong>
                                 <span style={{ fontSize: '11px', color: 'var(--ink-2)' }}>
-                                  {app.founderEmail || app.email || app.profile?.email || 'No email'}
+                                  {app.founderEmail || app.email || app.profile?.email || '—'}
                                 </span>
                                 {app.founderPhone && (
                                   <div style={{ fontSize: '10.5px', color: 'var(--ink-3)', marginTop: '2px' }}>
@@ -888,7 +1007,7 @@ export default function AdminPage() {
                                     whiteSpace: 'nowrap'
                                   }}
                                 >
-                                  {app.idea?.problem || app.idea?.description || app.description || 'No description provided'}
+                                  {app.idea?.problem || app.problem || app.ideaSummary || app.idea?.description || app.description || 'No description provided'}
                                 </p>
                               </td>
 
@@ -901,13 +1020,14 @@ export default function AdminPage() {
                                       padding: '3px 8px',
                                       borderRadius: '6px',
                                       background: 'var(--paper-2)',
-                                      color: 'var(--ink)'
+                                      color: 'var(--ink)',
+                                      fontWeight: 600
                                     }}
                                   >
                                     📎 {docsCount} file{docsCount > 1 ? 's' : ''}
                                   </span>
                                 ) : (
-                                  <span style={{ fontSize: '11px', color: 'var(--ink-4)' }}>No deck</span>
+                                  <span style={{ fontSize: '11px', color: 'var(--ink-4)' }}>—</span>
                                 )}
                               </td>
 
@@ -917,12 +1037,11 @@ export default function AdminPage() {
                                   className="badge"
                                   style={{
                                     fontSize: '11px',
-                                    background:
-                                      (app.stage || 1) >= 2 ? 'var(--green-soft)' : 'var(--cream)',
-                                    color: (app.stage || 1) >= 2 ? 'var(--green)' : 'var(--brown)'
+                                    background: stageNum >= 2 ? 'var(--green-soft)' : 'var(--cream)',
+                                    color: stageNum >= 2 ? 'var(--green)' : 'var(--brown)'
                                   }}
                                 >
-                                  Phase 0{app.stage || 1}
+                                  Phase 0{stageNum}
                                 </span>
                               </td>
 
@@ -1342,6 +1461,38 @@ export default function AdminPage() {
                       </div>
                     </div>
 
+                    {/* WHY IDEACUBATOR (STUDIO SYNERGY) */}
+                    {selectedApp.whyUs && (
+                      <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--brown)', marginBottom: '8px' }}>
+                          Why Ideacubator / Founder Objective
+                        </div>
+                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--ink)', lineHeight: 1.5 }}>
+                          {selectedApp.whyUs}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* PAST REVIEWER COMMENTS OR RATING */}
+                    {(selectedApp.reviewerComments || selectedApp.rating) && (
+                      <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)', marginBottom: '8px' }}>
+                          Diligence Notes &amp; Scoring
+                        </div>
+                        {selectedApp.rating && (
+                          <div style={{ marginBottom: '6px', fontSize: '12.5px' }}>
+                            <span style={{ color: 'var(--ink-3)' }}>Evaluation Rating: </span>
+                            <strong style={{ color: 'var(--amber)' }}>{'★'.repeat(Number(selectedApp.rating))} ({selectedApp.rating}/5)</strong>
+                          </div>
+                        )}
+                        {selectedApp.reviewerComments && (
+                          <p style={{ margin: 0, fontSize: '13px', color: 'var(--ink)', fontStyle: 'italic', background: 'var(--surface)', padding: '10px 12px', borderRadius: '8px' }}>
+                            &ldquo;{selectedApp.reviewerComments}&rdquo;
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     {/* SITUATION-SPECIFIC SUBMISSION DETAILS */}
                     {selectedApp.extra && Object.keys(selectedApp.extra).length > 0 && (
                       <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
@@ -1462,58 +1613,63 @@ export default function AdminPage() {
                     </div>
 
                     {/* ATTACHED DOCUMENTS & PITCH DECKS */}
-                    <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
-                      <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)', marginBottom: '8px' }}>
-                        Pitch Decks &amp; Attached Files ({selectedApp.documents?.length || 0})
-                      </div>
-                      {selectedApp.documents && selectedApp.documents.length > 0 ? (
-                        <div style={{ display: 'grid', gap: '8px' }}>
-                          {selectedApp.documents.map((doc: any, idx: number) => (
-                            <div
-                              key={idx}
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                padding: '10px 14px',
-                                background: 'var(--surface)',
-                                borderRadius: '8px',
-                                border: '1px solid var(--line)'
-                              }}
-                            >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                                <span style={{ fontSize: '16px' }}>📄</span>
-                                <div style={{ minWidth: 0 }}>
-                                  <div style={{ fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {doc.name || 'Pitch Deck'}
+                    {(() => {
+                      const appDocs = getAppDocuments(selectedApp);
+                      return (
+                        <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                          <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)', marginBottom: '8px' }}>
+                            Pitch Decks &amp; Attached Files ({appDocs.length})
+                          </div>
+                          {appDocs.length > 0 ? (
+                            <div style={{ display: 'grid', gap: '8px' }}>
+                              {appDocs.map((doc, idx) => (
+                                <div
+                                  key={idx}
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '10px 14px',
+                                    background: 'var(--surface)',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--line)'
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                                    <span style={{ fontSize: '16px' }}>📄</span>
+                                    <div style={{ minWidth: 0 }}>
+                                      <div style={{ fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {doc.name || 'Pitch Deck'}
+                                      </div>
+                                      {doc.size && (
+                                        <span style={{ fontSize: '11px', color: 'var(--ink-3)' }}>
+                                          {(doc.size / 1024).toFixed(1)} KB
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
-                                  {doc.size && (
-                                    <span style={{ fontSize: '11px', color: 'var(--ink-3)' }}>
-                                      {(doc.size / 1024).toFixed(1)} KB
-                                    </span>
+                                  {doc.downloadUrl && doc.downloadUrl !== '#' && (
+                                    <a
+                                      href={doc.downloadUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="secondary"
+                                      style={{ fontSize: '11px', padding: '5px 12px', textDecoration: 'none', fontWeight: 600 }}
+                                    >
+                                      Download ↗
+                                    </a>
                                   )}
                                 </div>
-                              </div>
-                              {doc.downloadUrl && (
-                                <a
-                                  href={doc.downloadUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="secondary"
-                                  style={{ fontSize: '11px', padding: '5px 12px', textDecoration: 'none', fontWeight: 600 }}
-                                >
-                                  Download ↗
-                                </a>
-                              )}
+                              ))}
                             </div>
-                          ))}
+                          ) : (
+                            <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-3)' }}>
+                              No pitch deck files attached for this submission.
+                            </p>
+                          )}
                         </div>
-                      ) : (
-                        <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-3)' }}>
-                          No pitch deck files attached for this submission.
-                        </p>
-                      )}
-                    </div>
+                      );
+                    })()}
 
                     {/* VENTURE DETAILS DOSSIER */}
                     <div style={{ display: 'grid', gap: '12px' }}>
