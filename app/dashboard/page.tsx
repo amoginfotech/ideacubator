@@ -329,13 +329,20 @@ export default function DashboardPage() {
     }
   };
 
-  // Handle removing a document from the idea drawer
+  // Handle removing a document from the idea drawer (Soft Delete: do not remove from storage)
   const handleRemoveDrawerDoc = async (index: number) => {
     if (!drawerIdea) return;
-    const updatedDocs = (drawerIdea.documents || []).filter((_: any, i: number) => i !== index);
+    const currentDocs = drawerIdea.documents || [];
+    const targetDoc = currentDocs[index];
+    if (!targetDoc) return;
+
+    // SOFT DELETE: Mark document as deleted with timestamp, preserving file on storage/disk
+    const updatedDocs = currentDocs.map((doc: any, i: number) =>
+      i === index ? { ...doc, isDeleted: true, deletedAt: new Date().toISOString() } : doc
+    );
     setDrawerIdea((prev: any) => ({ ...prev, documents: updatedDocs }));
 
-    // Auto-sync document removal to Firestore immediately
+    // Auto-sync document soft delete to Firestore immediately
     try {
       const appRef = doc(db, 'applications', drawerIdea.id);
       await updateDoc(appRef, {
@@ -350,7 +357,7 @@ export default function DashboardPage() {
       console.warn('Auto-sync document removal notice:', syncErr);
     }
 
-    showToast('Document removed from venture.');
+    showToast('Document removed from venture view (preserved securely in studio storage).');
   };
 
   // Save Idea Edits (Persists across all tabs: details, materials, links, notes)
@@ -1682,7 +1689,7 @@ export default function DashboardPage() {
                       <div>
                         <div style={{ fontSize: '13px', fontWeight: 600 }}>Pitch Decks &amp; Attached Files</div>
                         <div style={{ fontSize: '12px', color: 'var(--ink-3)' }}>
-                          {(drawerIdea.documents || []).length} file(s) attached
+                          {(drawerIdea.documents || []).filter((d: any) => !d.isDeleted).length} file(s) attached
                         </div>
                       </div>
                       <button
@@ -1743,67 +1750,70 @@ export default function DashboardPage() {
                     </div>
 
                     {/* EXISTING DOCUMENTS LIST */}
-                    {drawerIdea.documents && drawerIdea.documents.length > 0 ? (
+                    {drawerIdea.documents && drawerIdea.documents.filter((d: any) => !d.isDeleted).length > 0 ? (
                       <div style={{ display: 'grid', gap: '8px', marginBottom: '20px' }}>
-                        {drawerIdea.documents.map((doc: any, i: number) => (
-                          <div
-                            key={i}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '10px 14px',
-                              background: 'var(--paper)',
-                              borderRadius: '10px',
-                              border: '1px solid var(--line)'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
-                              <span style={{ fontSize: '18px' }}>📄</span>
-                              <div style={{ minWidth: 0 }}>
-                                <div style={{ fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                  {doc.name || 'Document'}
-                                </div>
-                                <div style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'flex', gap: '8px' }}>
-                                  {doc.size ? <span>{formatFileSize(doc.size)}</span> : null}
-                                  {doc.uploadedAt ? (
-                                    <span>• {new Date(doc.uploadedAt).toLocaleDateString()}</span>
-                                  ) : null}
+                        {drawerIdea.documents.map((doc: any, i: number) => {
+                          if (doc.isDeleted) return null;
+                          return (
+                            <div
+                              key={i}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '10px 14px',
+                                background: 'var(--paper)',
+                                borderRadius: '10px',
+                                border: '1px solid var(--line)'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+                                <span style={{ fontSize: '18px' }}>📄</span>
+                                <div style={{ minWidth: 0 }}>
+                                  <div style={{ fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {doc.name || 'Document'}
+                                  </div>
+                                  <div style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'flex', gap: '8px' }}>
+                                    {doc.size ? <span>{formatFileSize(doc.size)}</span> : null}
+                                    {doc.uploadedAt ? (
+                                      <span>• {new Date(doc.uploadedAt).toLocaleDateString()}</span>
+                                    ) : null}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
-                              {doc.downloadUrl && (
-                                <a
-                                  href={doc.downloadUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="secondary"
-                                  style={{ fontSize: '11px', padding: '5px 10px', textDecoration: 'none' }}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
+                                {doc.downloadUrl && (
+                                  <a
+                                    href={doc.downloadUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="secondary"
+                                    style={{ fontSize: '11px', padding: '5px 10px', textDecoration: 'none' }}
+                                  >
+                                    Download ↗
+                                  </a>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveDrawerDoc(i)}
+                                  title="Remove document"
+                                  style={{
+                                    background: 'var(--red-soft)',
+                                    color: 'var(--red)',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    padding: '5px 9px',
+                                    fontSize: '11px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer'
+                                  }}
                                 >
-                                  Download ↗
-                                </a>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveDrawerDoc(i)}
-                                title="Remove document"
-                                style={{
-                                  background: 'var(--red-soft)',
-                                  color: 'var(--red)',
-                                  border: 'none',
-                                  borderRadius: '6px',
-                                  padding: '5px 9px',
-                                  fontSize: '11px',
-                                  fontWeight: 600,
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                ✕ Remove
-                              </button>
+                                  ✕ Remove
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <div style={{ textAlign: 'center', padding: '24px 16px', background: 'var(--paper)', borderRadius: '10px', border: '1px dashed var(--line)', marginBottom: '16px' }}>
