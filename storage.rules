@@ -1,0 +1,58 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        request.auth.token.email in ['admin@ideacubator.in', 'brijesh@ideacubator.in', 'team@ideacubator.in']
+      );
+    }
+
+    function isValidDocType() {
+      return request.resource.contentType.matches('application/pdf')
+          || request.resource.contentType.matches('application/msword')
+          || request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+          || request.resource.contentType.matches('application/vnd.ms-powerpoint')
+          || request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.presentationml.presentation')
+          || request.resource.contentType.matches('image/jpeg')
+          || request.resource.contentType.matches('image/png')
+          || request.resource.contentType.matches('application/octet-stream');
+    }
+
+    function isUnder10MB() {
+      return request.resource.size <= 10 * 1024 * 1024;
+    }
+
+    // Application Documents & Materials
+    match /applications/{applicationId}/documents/{fileName} {
+      // Authenticated founder can upload to their application document directory
+      allow create: if isAuthenticated()
+                    && resource == null
+                    && isValidDocType()
+                    && isUnder10MB()
+                    && request.resource.metadata != null
+                    && request.resource.metadata.applicantUid == request.auth.uid;
+
+      // Only the applicant who uploaded or an admin can read the file
+      allow read: if isAdmin() || (
+        isAuthenticated() &&
+        resource.metadata != null &&
+        resource.metadata.applicantUid == request.auth.uid
+      );
+
+      // Overwrites are strictly prohibited; Only admins can delete
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // Default Deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /pages/admin.html
+Disallow: /pages/dashboard.html
+
+Sitemap: https://ideacubator.in/sitemap.xml

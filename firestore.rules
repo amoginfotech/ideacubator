@@ -1,0 +1,160 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── HELPER FUNCTIONS ──
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+        request.auth.token.email in ['admin@ideacubator.in', 'brijesh@ideacubator.in', 'team@ideacubator.in', 'submitidea@ideacubator.in', 'amoginfotech@gmail.com'] ||
+        request.auth.token.email.matches('.*@ideacubator[.]in$') ||
+        request.auth.token.email.matches('.*amoginfotech.*')
+      );
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // ── APPLICATIONS ──
+    match /applications/{appId} {
+      // Founders can only read their own application; Admins can read all
+      allow read: if (isAuthenticated() && resource.data.applicantUid == request.auth.uid) || isAdmin();
+
+      // Authenticated users can create their own application
+      // Status MUST be 'received' initially; applicantUid MUST match request.auth.uid
+      allow create: if isAuthenticated()
+                    && request.resource.data.applicantUid == request.auth.uid
+                    && request.resource.data.metadata.status == 'received';
+
+      // Founders can only update specific editable fields (cannot change status, applicantUid, or internal history)
+      allow update: if isAdmin() || (
+        isAuthenticated()
+        && resource.data.applicantUid == request.auth.uid
+        && request.resource.data.applicantUid == resource.data.applicantUid
+        && request.resource.data.metadata.status == resource.data.metadata.status
+        && request.resource.data.metadata.createdAt == resource.data.metadata.createdAt
+      );
+
+      // Only Admins can delete
+      allow delete: if isAdmin();
+    }
+
+    // ── MESSAGES ──
+    match /messages/{messageId} {
+      // Reading messages requires being the founder associated with the application or an admin
+      allow read: if isAdmin() || (
+        isAuthenticated() && (
+          resource.data.senderUid == request.auth.uid ||
+          (exists(/databases/$(database)/documents/applications/$(resource.data.applicationId)) &&
+           get(/databases/$(database)/documents/applications/$(resource.data.applicationId)).data.applicantUid == request.auth.uid)
+        )
+      );
+
+      // Founders can send messages for their own application
+      allow create: if isAuthenticated() && (
+        isAdmin() || (
+          request.resource.data.senderUid == request.auth.uid &&
+          exists(/databases/$(database)/documents/applications/$(request.resource.data.applicationId)) &&
+          get(/databases/$(database)/documents/applications/$(request.resource.data.applicationId)).data.applicantUid == request.auth.uid
+        )
+      );
+
+      // Only Admins can update/delete messages
+      allow update, delete: if isAdmin();
+    }
+
+    // ── MEETINGS ──
+    match /meetings/{meetingId} {
+      // Founders can read meetings for their application; Admins can read all
+      allow read: if isAdmin() || (
+        isAuthenticated() && (
+          resource.data.applicantUid == request.auth.uid ||
+          (exists(/databases/$(database)/documents/applications/$(resource.data.applicationId)) &&
+           get(/databases/$(database)/documents/applications/$(resource.data.applicationId)).data.applicantUid == request.auth.uid)
+        )
+      );
+
+      // Founders can create a meeting request for their application; Admins can schedule
+      allow create: if isAuthenticated() && (
+        isAdmin() || (
+          request.resource.data.applicantUid == request.auth.uid &&
+          request.resource.data.status == 'requested'
+        )
+      );
+
+      // Only Admins can confirm or reschedule
+      allow update, delete: if isAdmin();
+    }
+
+    // ── TASKS ──
+    match /tasks/{taskId} {
+      // Founders can read tasks assigned to their application
+      allow read: if isAdmin() || (
+        isAuthenticated() && (
+          resource.data.applicantUid == request.auth.uid ||
+          (exists(/databases/$(database)/documents/applications/$(resource.data.applicationId)) &&
+           get(/databases/$(database)/documents/applications/$(resource.data.applicationId)).data.applicantUid == request.auth.uid)
+        )
+      );
+
+      // Admins can create tasks
+      allow create: if isAdmin();
+
+      // Founders can toggle completion status on tasks assigned to them
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        resource.data.applicantUid == request.auth.uid &&
+        request.resource.data.title == resource.data.title
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // ── NOTIFICATIONS ──
+    match /notifications/{notifId} {
+      allow read, update: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow create, delete: if isAdmin();
+    }
+
+    // ── INTERNAL ADMIN NOTES (STRICTLY PRIVATE - FOUNDERS CAN NEVER READ) ──
+    match /admin_notes/{noteId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ── USERS ──
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create, update: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if isAdmin();
+    }
+
+    // ── INQUIRIES ──
+    match /contactInquiries/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /investorInquiries/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── AUDIT HISTORY ──
+    match /status_history/{historyId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.applicantUid == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // ── DEFAULT DENY ──
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
