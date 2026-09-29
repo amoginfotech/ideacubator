@@ -282,27 +282,25 @@ export default function DashboardPage() {
     setDocUploadError('');
     setIsUploadingDoc(true);
     try {
-      const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const uniqueName = `${Date.now()}_${sanitizedName}`;
-      const storagePath = `applications/${drawerIdea.id}/documents/${uniqueName}`;
-      const storageRef = ref(storage, storagePath);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('applicantUid', user.uid);
+      formData.append('applicationId', drawerIdea.id);
 
-      await uploadBytes(storageRef, file, {
-        contentType: file.type || 'application/octet-stream',
-        customMetadata: {
-          applicantUid: user.uid,
-          originalName: file.name
-        }
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
       });
 
-      const downloadUrl = await getDownloadURL(storageRef);
+      if (!res.ok) throw new Error('Upload service returned error');
+      const data = await res.json();
 
       const newDoc = {
         name: file.name,
         size: file.size,
-        storagePath,
-        downloadUrl,
-        uploadedAt: new Date().toISOString()
+        storagePath: data.storagePath,
+        downloadUrl: data.downloadUrl,
+        uploadedAt: data.uploadedAt || new Date().toISOString()
       };
 
       const updatedDocs = [...(drawerIdea.documents || []), newDoc];

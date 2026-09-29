@@ -291,30 +291,30 @@ export default function SubmitIdeaPage() {
         let fileIndex = 0;
         for (const file of attachedFiles) {
           try {
-            const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const uniqueName = `${Date.now()}_${sanitizedName}`;
-            const storagePath = `applications/${applicationId}/documents/${uniqueName}`;
-            const storageRef = ref(storage, storagePath);
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('applicantUid', user.uid);
+            formData.append('applicationId', applicationId);
 
-            await uploadBytes(storageRef, file, {
-              contentType: file.type || 'application/octet-stream',
-              customMetadata: {
-                applicantUid: user.uid,
-                originalName: file.name
-              }
+            const res = await fetch('/api/upload', {
+              method: 'POST',
+              body: formData
             });
 
-            const downloadUrl = await getDownloadURL(storageRef);
-
-            uploadedDocs.push({
-              name: file.name,
-              size: file.size,
-              storagePath,
-              downloadUrl,
-              uploadedAt: new Date().toISOString()
-            });
+            if (res.ok) {
+              const data = await res.json();
+              uploadedDocs.push({
+                name: file.name,
+                size: file.size,
+                storagePath: data.storagePath,
+                downloadUrl: data.downloadUrl,
+                uploadedAt: data.uploadedAt || new Date().toISOString()
+              });
+            } else {
+              throw new Error('Upload API returned non-OK');
+            }
           } catch (uploadErr: any) {
-            console.warn('Failed to upload file to Firebase Storage:', file.name, uploadErr);
+            console.warn('Failed to upload file to storage:', file.name, uploadErr);
             uploadedDocs.push({
               name: file.name,
               size: file.size,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { put } from '@vercel/blob';
 import fs from 'fs';
 import path from 'path';
 
@@ -9,27 +10,42 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const applicantUid = (formData.get('applicantUid') as string) || 'anonymous';
+    const applicationId = (formData.get('applicationId') as string) || 'general';
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Ensure uploads directory exists
+    const originalName = file.name || 'document.pdf';
+    const sanitizedBase = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const pathname = `applications/${applicationId}/${Date.now()}_${sanitizedBase}`;
+
+    // 1. If Vercel Blob token is available (Production on Vercel), upload permanently to Vercel Blob
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const blob = await put(pathname, file, {
+        access: 'public',
+      });
+
+      return NextResponse.json({
+        success: true,
+        name: originalName,
+        size: file.size,
+        storagePath: blob.pathname,
+        downloadUrl: blob.url,
+        uploadedAt: new Date().toISOString()
+      });
+    }
+
+    // 2. Local development fallback (when testing locally without Vercel Blob token)
     const uploadsDir = path.join(process.cwd(), 'uploads');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    // Sanitize filename and create unique name
-    const originalName = file.name || 'document.pdf';
-    const sanitizedBase = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const uniqueFileName = `${Date.now()}_${sanitizedBase}`;
     const filePath = path.join(uploadsDir, uniqueFileName);
-
-    // Write file buffer to disk
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    await fs.promises.writeFile(filePath, buffer);
+    await fs.promises.writeFile(filePath, Buffer.from(arrayBuffer));
 
     return NextResponse.json({
       success: true,
