@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { auth, db, googleProvider } from '@/lib/firebase';
+import { auth, db, storage, googleProvider } from '@/lib/firebase';
 import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   collection,
   query,
@@ -273,32 +274,35 @@ export default function DashboardPage() {
       setDocUploadError('Supported file formats: PDF, DOC, DOCX, PPT, PPTX only.');
       return;
     }
-    if (file.size > 15 * 1024 * 1024) {
-      setDocUploadError('File exceeds 15MB limit.');
+    if (file.size > 10 * 1024 * 1024) {
+      setDocUploadError('File exceeds 10MB limit.');
       return;
     }
 
     setDocUploadError('');
     setIsUploadingDoc(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('applicantUid', user.uid);
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const uniqueName = `${Date.now()}_${sanitizedName}`;
+      const storagePath = `applications/${drawerIdea.id}/documents/${uniqueName}`;
+      const storageRef = ref(storage, storagePath);
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
+      await uploadBytes(storageRef, file, {
+        contentType: file.type || 'application/octet-stream',
+        customMetadata: {
+          applicantUid: user.uid,
+          originalName: file.name
+        }
       });
 
-      if (!res.ok) throw new Error('Upload service returned error');
-      const data = await res.json();
+      const downloadUrl = await getDownloadURL(storageRef);
 
       const newDoc = {
         name: file.name,
         size: file.size,
-        storagePath: data.storagePath,
-        downloadUrl: data.downloadUrl,
-        uploadedAt: data.uploadedAt || new Date().toISOString()
+        storagePath,
+        downloadUrl,
+        uploadedAt: new Date().toISOString()
       };
 
       const updatedDocs = [...(drawerIdea.documents || []), newDoc];
