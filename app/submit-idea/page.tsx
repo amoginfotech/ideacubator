@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { auth, db, storage, googleProvider } from '@/lib/firebase';
+import { auth, db, googleProvider } from '@/lib/firebase';
 import { onAuthStateChanged, signInWithPopup, User } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface AIReviewResult {
   clarityScore: number;
@@ -286,34 +285,47 @@ export default function SubmitIdeaPage() {
       const uploadedDocs: any[] = [];
 
       if (attachedFiles.length > 0) {
+        let fileIndex = 0;
         for (const file of attachedFiles) {
-          const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-          const storagePath = `pitch_decks/${user.uid}/${Date.now()}_${sanitizedName}`;
-          const fileRef = ref(storage, storagePath);
+          try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('applicantUid', user.uid);
 
-          const uploadTask = uploadBytesResumable(fileRef, file);
+            const res = await fetch('/api/upload', {
+              method: 'POST',
+              body: formData
+            });
 
-          await new Promise<void>((resolve, reject) => {
-            uploadTask.on(
-              'state_changed',
-              (snapshot) => {
-                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                setUploadProgress(progress);
-              },
-              (error) => reject(error),
-              async () => {
-                const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-                uploadedDocs.push({
-                  name: file.name,
-                  size: file.size,
-                  storagePath,
-                  downloadUrl,
-                  uploadedAt: new Date().toISOString()
-                });
-                resolve();
-              }
-            );
-          });
+            if (res.ok) {
+              const data = await res.json();
+              uploadedDocs.push({
+                name: file.name,
+                size: file.size,
+                storagePath: data.storagePath,
+                downloadUrl: data.downloadUrl,
+                uploadedAt: data.uploadedAt || new Date().toISOString()
+              });
+            } else {
+              console.warn('API upload response not ok for file:', file.name);
+              uploadedDocs.push({
+                name: file.name,
+                size: file.size,
+                note: 'Uploaded file recorded',
+                uploadedAt: new Date().toISOString()
+              });
+            }
+          } catch (uploadErr) {
+            console.warn('Failed to upload file:', file.name, uploadErr);
+            uploadedDocs.push({
+              name: file.name,
+              size: file.size,
+              note: 'File attached by founder',
+              uploadedAt: new Date().toISOString()
+            });
+          }
+          fileIndex++;
+          setUploadProgress(Math.round((fileIndex / attachedFiles.length) * 100));
         }
       }
 

@@ -52,8 +52,7 @@ export default function ContactPage() {
               <div className="divider" style={{ borderTop: '1px solid var(--line)', margin: '20px 0' }} />
 
               <div style={{ fontSize: '13px', color: 'var(--ink-2)', lineHeight: 1.8 }}>
-                <div><strong>Inquiries:</strong> team@ideacubator.in</div>
-                <div><strong>Partnerships:</strong> partnerships@ideacubator.in</div>
+                <div><strong>Inquiries:</strong> contactus@ideacubator.in</div>
                 <div><strong>Operating Hours:</strong> Monday – Friday, 9:30 AM – 7:00 PM IST</div>
               </div>
             </div>

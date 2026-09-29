@@ -39,4 +39,6 @@ build/
 # Backup & Temporary files
 backup/
 scratch/
+uploads/
 *.tmp
+

@@ -65,6 +65,18 @@ export default function AdminPage() {
       userEmailLower.includes('amoginfotech') ||
       userEmailLower.includes('brijesh'));
 
+  const handleAdminSignIn = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err: any) {
+      if (err?.code === 'auth/popup-blocked') {
+        alert('Google Sign-in popup was blocked by your browser. Please allow popups for localhost:3000 to sign in.');
+      } else if (err?.code !== 'auth/popup-closed-by-user') {
+        alert('Sign-in error: ' + (err.message || err.code));
+      }
+    }
+  };
+
   useEffect(() => {
     if (!isAdmin) return;
 
@@ -187,7 +199,7 @@ export default function AdminPage() {
               Deal flow evaluation, pipeline scoring, and due diligence are restricted to authorized review committee partners.
             </p>
             {!user ? (
-              <button className="google" type="button" onClick={() => signInWithPopup(auth, googleProvider)} style={{ width: '100%' }}>
+              <button className="google" type="button" onClick={handleAdminSignIn} style={{ width: '100%' }}>
                 Sign in with Partner Google Account
               </button>
             ) : (
