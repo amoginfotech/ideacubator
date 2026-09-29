@@ -578,7 +578,7 @@ export default function SecureAdminConsolePage() {
             </span>
             <h2 style={{ fontSize: '22px', margin: '6px 0 10px' }}>Studio Diligence &amp; Review</h2>
             <p style={{ color: 'var(--ink-2)', fontSize: '13.5px', marginBottom: '22px', lineHeight: 1.5 }}>
-              Access is restricted strictly to authorized studio administrator (<strong>{AUTHORIZED_ADMIN_EMAIL}</strong>).
+              Access is restricted strictly to authorized studio administrators.
             </p>
 
             {authError && (
@@ -664,7 +664,7 @@ export default function SecureAdminConsolePage() {
                   <div style={{ flex: 1, height: '1px', background: 'var(--line)' }} />
                 </div>
 
-                {/* 2. Google Sign-In for admin@ideacubator.in Workspace account */}
+                {/* 2. Google Sign-In */}
                 <button
                   className="google"
                   type="button"
@@ -672,7 +672,7 @@ export default function SecureAdminConsolePage() {
                   disabled={signingIn}
                   style={{ width: '100%', fontSize: '13px', padding: '10px' }}
                 >
-                  Sign in with Google ({AUTHORIZED_ADMIN_EMAIL})
+                  Sign in with Google
                 </button>
               </div>
             ) : (
