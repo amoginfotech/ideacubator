@@ -44,6 +44,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   deferred: { label: 'Deferred', color: 'var(--ink-3)', bg: 'var(--paper-2)' }
 };
 
+type DrawerTab = 'founder' | 'idea' | 'chat' | 'meeting';
+
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,7 +67,13 @@ export default function AdminPage() {
   // Side Drawer State
   const [selectedApp, setSelectedApp] = useState<any | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerTab, setDrawerTab] = useState<'details' | 'chat' | 'meeting'>('details');
+  const [drawerTab, setDrawerTab] = useState<DrawerTab>('founder');
+
+  // Approval Modal with Mandatory Comments
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+  const [approvalComment, setApprovalComment] = useState('');
+  const [approvalError, setApprovalError] = useState('');
+  const [approving, setApproving] = useState(false);
 
   // In-Drawer Actions
   const [adminMsg, setAdminMsg] = useState('');
@@ -185,11 +193,68 @@ export default function AdminPage() {
   }, [isAdmin]);
 
   // Action: Open Idea in Side Drawer
-  const openAppDrawer = (app: any, initialTab: 'details' | 'chat' | 'meeting' = 'details') => {
+  const openAppDrawer = (app: any, initialTab: DrawerTab = 'founder') => {
     setSelectedApp(app);
     setDrawerTab(initialTab);
     setIsDrawerOpen(true);
     setMeetingDate(new Date().toISOString().split('T')[0]);
+  };
+
+  // Action: Trigger Mandatory Approval Modal
+  const triggerApproveModal = () => {
+    if (!selectedApp) return;
+    setApprovalComment(selectedApp.approvalComment || '');
+    setApprovalError('');
+    setIsApprovalModalOpen(true);
+  };
+
+  // Action: Confirm Approval with Mandatory Comments
+  const handleConfirmApproval = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedApp || !user) return;
+    if (!approvalComment.trim()) {
+      setApprovalError('Approver comments are mandatory to approve this venture for studio co-building.');
+      return;
+    }
+
+    setApproving(true);
+    try {
+      const comment = approvalComment.trim();
+      const updates = {
+        status: 'approved',
+        stage: 2,
+        approvalComment: comment,
+        approvedBy: user.email,
+        approvedAt: serverTimestamp(),
+        'metadata.status': 'approved',
+        'metadata.updatedAt': serverTimestamp()
+      };
+
+      await updateDoc(doc(db, 'applications', selectedApp.id), updates);
+
+      // Post official announcement message in the chat thread
+      await addDoc(collection(db, 'messages'), {
+        applicationId: selectedApp.id,
+        applicationTitle: selectedApp.idea?.title || selectedApp.title || selectedApp.ideaName || 'Venture',
+        senderUid: user.uid,
+        senderRole: 'team',
+        senderName: 'Ideacubator Investment Committee',
+        content: `🎉 Congratulations! Your venture has been APPROVED for Ideacubator Studio Co-Building and advanced to Phase 02 Validation.\n\nPartner Diligence Comments:\n"${comment}"`,
+        createdAt: serverTimestamp()
+      });
+
+      setSelectedApp({
+        ...selectedApp,
+        ...updates
+      });
+
+      setIsApprovalModalOpen(false);
+      showToast('Venture approved! Promoted to Phase 02 Validation.');
+    } catch (err: any) {
+      alert('Failed to approve venture: ' + err.message);
+    } finally {
+      setApproving(false);
+    }
   };
 
   // Action: Update Stage
@@ -197,7 +262,7 @@ export default function AdminPage() {
     if (!selectedApp) return;
 
     // Rule: Phase 02+ requires approval
-    const currentStatus = selectedApp.status || selectedApp.metadata?.status || 'received';
+    const currentStatus = (selectedApp.status || selectedApp.metadata?.status || 'received').toLowerCase();
     if (newStage >= 2 && currentStatus !== 'approved') {
       alert('Phase 02 (Validation) and later phases require the venture to be Approved first.');
       return;
@@ -218,9 +283,15 @@ export default function AdminPage() {
     }
   };
 
-  // Action: Update Status
+  // Action: Update Status (intercept approval for mandatory comments)
   const handleUpdateStatus = async (newStatus: string) => {
     if (!selectedApp) return;
+
+    if (newStatus === 'approved') {
+      triggerApproveModal();
+      return;
+    }
+
     setUpdating(true);
     try {
       const updates: any = {
@@ -233,9 +304,7 @@ export default function AdminPage() {
         updates.stage = 1;
       }
 
-      await updateDoc(doc(db, 'applications', selectedApp.id), {
-        ...updates
-      });
+      await updateDoc(doc(db, 'applications', selectedApp.id), updates);
       setSelectedApp({
         ...selectedApp,
         ...updates
@@ -243,30 +312,6 @@ export default function AdminPage() {
       showToast(`Venture status updated to ${newStatus.replace('_', ' ')}.`);
     } catch (err: any) {
       alert('Failed to update status: ' + err.message);
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  // Action: One-Click Approve & Unlock Phase 02
-  const handleQuickApprove = async () => {
-    if (!selectedApp) return;
-    setUpdating(true);
-    try {
-      await updateDoc(doc(db, 'applications', selectedApp.id), {
-        status: 'approved',
-        stage: 2,
-        'metadata.status': 'approved',
-        'metadata.updatedAt': serverTimestamp()
-      });
-      setSelectedApp({
-        ...selectedApp,
-        status: 'approved',
-        stage: 2
-      });
-      showToast('Venture approved! Promoted to Phase 02 Validation.');
-    } catch (err: any) {
-      alert('Failed to approve: ' + err.message);
     } finally {
       setUpdating(false);
     }
@@ -309,7 +354,7 @@ export default function AdminPage() {
       const founderName = selectedApp.founderName || selectedApp.profile?.fullName || 'Founder';
       const appTitle = selectedApp.idea?.title || selectedApp.title || 'Venture Concept';
 
-      const mtgDoc = await addDoc(collection(db, 'meetings'), {
+      await addDoc(collection(db, 'meetings'), {
         applicationId: selectedApp.id,
         applicationTitle: appTitle,
         applicantUid: selectedApp.applicantUid || selectedApp.userId || '',
@@ -336,7 +381,7 @@ export default function AdminPage() {
       });
 
       showToast(`Strategy session confirmed for ${meetingDate}.`);
-      setDrawerTab('details');
+      setDrawerTab('founder');
     } catch (err: any) {
       alert('Failed to schedule meeting: ' + err.message);
     } finally {
@@ -445,9 +490,13 @@ export default function AdminPage() {
     );
   }
 
-  // Filter messages for current drawer app
+  // Filter messages & meetings for current drawer app
   const appMessages = selectedApp
     ? allMessages.filter((m) => m.applicationId === selectedApp.id)
+    : [];
+
+  const appMeetings = selectedApp
+    ? meetings.filter((m) => m.applicationId === selectedApp.id)
     : [];
 
   return (
@@ -802,7 +851,7 @@ export default function AdminPage() {
                           return (
                             <tr
                               key={app.id}
-                              onClick={() => openAppDrawer(app)}
+                              onClick={() => openAppDrawer(app, 'founder')}
                               style={{
                                 cursor: 'pointer',
                                 borderBottom: '1px solid var(--line)',
@@ -905,7 +954,7 @@ export default function AdminPage() {
                                   <button
                                     type="button"
                                     className="primary"
-                                    onClick={() => openAppDrawer(app, 'details')}
+                                    onClick={() => openAppDrawer(app, 'founder')}
                                     style={{ fontSize: '11px', padding: '6px 12px' }}
                                   >
                                     Review ↗
@@ -1089,10 +1138,10 @@ export default function AdminPage() {
       </div>
 
       {/* ════════════════════════════════════════════════════════════════
-          SLIDE-OVER SIDE DRAWER: VENTURE DILIGENCE, ACTIONS & CHAT
+          SLIDE-OVER SIDE DRAWER: 4 COMPREHENSIVE REVIEW TABS
       ════════════════════════════════════════════════════════════════ */}
       <div className={`drawer-backdrop ${isDrawerOpen ? 'open' : ''}`} onClick={() => setIsDrawerOpen(false)}>
-        <div className="slide-drawer" onClick={(e) => e.stopPropagation()} style={{ width: 'min(580px, 94vw)' }}>
+        <div className="slide-drawer" onClick={(e) => e.stopPropagation()} style={{ width: 'min(620px, 94vw)' }}>
           {selectedApp && (
             <>
               {/* DRAWER HEADER */}
@@ -1142,7 +1191,7 @@ export default function AdminPage() {
                   onClick={() => setDrawerTab('chat')}
                   style={{ fontWeight: drawerTab === 'chat' ? 700 : 500 }}
                 >
-                  💬 Live In-App Chat
+                  💬 Live Chat
                 </button>
                 <button
                   type="button"
@@ -1150,7 +1199,7 @@ export default function AdminPage() {
                   onClick={() => setDrawerTab('meeting')}
                   style={{ fontWeight: drawerTab === 'meeting' ? 700 : 500 }}
                 >
-                  📅 Schedule Diligence Call
+                  📅 Book Diligence Call
                 </button>
                 {selectedApp.founderPhone && (
                   <a
@@ -1165,35 +1214,157 @@ export default function AdminPage() {
                 )}
               </div>
 
-              {/* TABS INSIDE DRAWER */}
+              {/* 4 REVIEW TABS: PROFILE, IDEA, CHAT, MEETINGS */}
               <div className="drawer-tab-nav">
                 <button
                   type="button"
-                  className={`drawer-tab-btn ${drawerTab === 'details' ? 'active' : ''}`}
-                  onClick={() => setDrawerTab('details')}
+                  className={`drawer-tab-btn ${drawerTab === 'founder' ? 'active' : ''}`}
+                  onClick={() => setDrawerTab('founder')}
                 >
-                  Diligence Dossier
+                  👤 Founder Profile
+                </button>
+                <button
+                  type="button"
+                  className={`drawer-tab-btn ${drawerTab === 'idea' ? 'active' : ''}`}
+                  onClick={() => setDrawerTab('idea')}
+                >
+                  💡 Venture &amp; Blueprint
                 </button>
                 <button
                   type="button"
                   className={`drawer-tab-btn ${drawerTab === 'chat' ? 'active' : ''}`}
                   onClick={() => setDrawerTab('chat')}
                 >
-                  Live Chat ({appMessages.length})
+                  💬 Live Chat ({appMessages.length})
                 </button>
                 <button
                   type="button"
                   className={`drawer-tab-btn ${drawerTab === 'meeting' ? 'active' : ''}`}
                   onClick={() => setDrawerTab('meeting')}
                 >
-                  Schedule Call
+                  📅 Meetings ({appMeetings.length})
                 </button>
               </div>
 
               {/* DRAWER BODY */}
               <div className="drawer-body">
-                {/* ── TAB 1: DILIGENCE DOSSIER ── */}
-                {drawerTab === 'details' && (
+                {/* ════════════════════════════════════════════════════
+                    TAB 1: 👤 FOUNDER COMPLETE PROFILE & DOSSIER
+                ════════════════════════════════════════════════════ */}
+                {drawerTab === 'founder' && (
+                  <div style={{ display: 'grid', gap: '16px' }}>
+                    {/* CONTACT CARD */}
+                    <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--brown)', marginBottom: '12px' }}>
+                        Founder Identity &amp; Contact Information
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Full Name</span>
+                          <strong style={{ fontSize: '14px', color: 'var(--ink)' }}>
+                            {selectedApp.founderName || selectedApp.profile?.fullName || 'Not provided'}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Primary Email</span>
+                          <span style={{ fontSize: '13.5px', color: 'var(--ink)' }}>
+                            {selectedApp.founderEmail || selectedApp.email || selectedApp.profile?.email || 'Not provided'}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Phone / Mobile</span>
+                          <span style={{ fontSize: '13.5px', color: 'var(--ink)' }}>
+                            {selectedApp.founderPhone || selectedApp.profile?.phone || 'Not provided'}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Operating Location</span>
+                          <span style={{ fontSize: '13.5px', color: 'var(--ink)' }}>
+                            {selectedApp.founderLocation || selectedApp.profile?.location || 'India'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* LinkedIn Profile */}
+                      {(selectedApp.profile?.linkedIn || selectedApp.linkedIn) && (
+                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--line)' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>LinkedIn Profile</span>
+                          <a
+                            href={selectedApp.profile?.linkedIn || selectedApp.linkedIn}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: '13px', color: 'var(--brown)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}
+                          >
+                            🔗 {selectedApp.profile?.linkedIn || selectedApp.linkedIn} ↗
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* PROFESSIONAL BACKGROUND & COMMITMENT */}
+                    <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)', marginBottom: '12px' }}>
+                        Professional Background &amp; Founder Situation
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Current Role / Title</span>
+                          <strong style={{ fontSize: '13.5px', color: 'var(--ink)' }}>
+                            {selectedApp.profile?.role || selectedApp.currentRole || 'Founder'}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Years of Experience</span>
+                          <span style={{ fontSize: '13.5px', color: 'var(--ink)' }}>
+                            {selectedApp.profile?.experienceYears ? `${selectedApp.profile.experienceYears} Years` : 'Not specified'}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Founder Profile Archetype</span>
+                          <strong style={{ fontSize: '13.5px', textTransform: 'capitalize', color: 'var(--ink)' }}>
+                            {selectedApp.founderType || selectedApp.profile?.userType || 'Professional with thesis'}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Founder Commitment Level</span>
+                          <span style={{ fontSize: '13.5px', color: 'var(--ink)', fontWeight: 600 }}>
+                            {selectedApp.idea?.founderCommitment || selectedApp.founderCommitment || selectedApp.profile?.commitment || 'Full-time founder'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SITUATION-SPECIFIC SUBMISSION DETAILS */}
+                    {selectedApp.extra && Object.keys(selectedApp.extra).length > 0 && (
+                      <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)', marginBottom: '10px' }}>
+                          Specific Situation Details
+                        </div>
+                        <div style={{ display: 'grid', gap: '8px' }}>
+                          {Object.entries(selectedApp.extra).map(([k, v]) => (
+                            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', padding: '6px 0', borderBottom: '1px solid var(--line)' }}>
+                              <span style={{ color: 'var(--ink-3)', textTransform: 'capitalize' }}>{k.replace(/([A-Z])/g, ' $1')}</span>
+                              <strong style={{ color: 'var(--ink)' }}>{String(v)}</strong>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ════════════════════════════════════════════════════
+                    TAB 2: 💡 VENTURE BLUEPRINT & ADJUDICATION
+                ════════════════════════════════════════════════════ */}
+                {drawerTab === 'idea' && (
                   <div style={{ display: 'grid', gap: '16px' }}>
                     {/* STAGE & STATUS ADJUDICATION CARD */}
                     <div style={{ padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
@@ -1228,7 +1399,6 @@ export default function AdminPage() {
                             style={{ fontWeight: 600 }}
                           >
                             <option value="1">Phase 01 — Diligence (Default)</option>
-                            {/* Phase 02+ only unlocked if approved */}
                             {(selectedApp.status || '').toLowerCase() === 'approved' ? (
                               <>
                                 <option value="2">Phase 02 — Problem Validation</option>
@@ -1241,7 +1411,7 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      {/* REQUIREMENT HELPER: PHASE 02 LOCKED UNTIL APPROVED */}
+                      {/* REQUIREMENT HELPER: MANDATORY APPROVAL COMMENTS BUTTON */}
                       {(selectedApp.status || '').toLowerCase() !== 'approved' ? (
                         <div
                           style={{
@@ -1259,22 +1429,34 @@ export default function AdminPage() {
                           <div style={{ fontSize: '12px', color: 'var(--ink-2)', lineHeight: 1.4 }}>
                             <strong>🔒 Phase 02 (Validation) is locked:</strong>
                             <div style={{ fontSize: '11px', color: 'var(--ink-3)', marginTop: '2px' }}>
-                              Approve this venture to advance past initial Phase 01 diligence into studio co-building.
+                              Approve this venture with mandatory partner comments to unlock Phase 02 and co-building.
                             </div>
                           </div>
                           <button
                             type="button"
                             className="primary"
-                            onClick={handleQuickApprove}
+                            onClick={triggerApproveModal}
                             disabled={updating}
                             style={{ fontSize: '11.5px', padding: '7px 14px', flexShrink: 0 }}
                           >
-                            ✓ Approve Venture
+                            ✓ Approve Venture →
                           </button>
                         </div>
                       ) : (
-                        <div style={{ fontSize: '12px', color: 'var(--green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          ✓ Venture Approved — All development phases (Phase 02 – 05) unlocked.
+                        <div style={{ padding: '12px 14px', background: 'var(--green-soft)', borderRadius: '10px', border: '1px solid #bbf7d0' }}>
+                          <div style={{ fontSize: '12.5px', color: 'var(--green)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            ✓ Venture Approved for Studio Co-Building
+                          </div>
+                          {selectedApp.approvedBy && (
+                            <div style={{ fontSize: '11px', color: 'var(--ink-2)', marginTop: '2px' }}>
+                              Approved by <strong>{selectedApp.approvedBy}</strong>
+                            </div>
+                          )}
+                          {selectedApp.approvalComment && (
+                            <div style={{ marginTop: '8px', fontSize: '12.5px', color: 'var(--ink)', background: 'var(--surface)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--line)', fontStyle: 'italic' }}>
+                              &ldquo;{selectedApp.approvalComment}&rdquo;
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1337,7 +1519,7 @@ export default function AdminPage() {
                     <div style={{ display: 'grid', gap: '12px' }}>
                       <div style={{ padding: '14px', background: 'var(--paper)', borderRadius: '10px' }}>
                         <strong style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--ink-3)', display: 'block' }}>
-                          Problem Statement
+                          Problem Statement &amp; Daily Friction
                         </strong>
                         <p style={{ margin: '6px 0 0', fontSize: '13.5px', color: 'var(--ink)', lineHeight: 1.5 }}>
                           {selectedApp.idea?.problem || selectedApp.problem || 'Not specified'}
@@ -1358,28 +1540,63 @@ export default function AdminPage() {
                           Solution Concept &amp; Architecture
                         </strong>
                         <p style={{ margin: '6px 0 0', fontSize: '13.5px', color: 'var(--ink)', lineHeight: 1.5 }}>
-                          {selectedApp.idea?.description || selectedApp.description || 'Not specified'}
+                          {selectedApp.idea?.description || selectedApp.description || selectedApp.ideaSummary || 'Not specified'}
+                        </p>
+                      </div>
+
+                      <div style={{ padding: '14px', background: 'var(--paper)', borderRadius: '10px' }}>
+                        <strong style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--ink-3)', display: 'block' }}>
+                          Traction &amp; Early Validation Evidence
+                        </strong>
+                        <p style={{ margin: '6px 0 0', fontSize: '13.5px', color: 'var(--ink)', lineHeight: 1.5 }}>
+                          {selectedApp.idea?.traction || selectedApp.traction || 'No traction reported yet'}
                         </p>
                       </div>
 
                       <div className="grid">
                         <div style={{ padding: '12px', background: 'var(--paper)', borderRadius: '8px' }}>
-                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Stage at Intake</span>
-                          <strong style={{ fontSize: '13px' }}>{selectedApp.idea?.currentStage || selectedApp.currentStage || 'Idea stage'}</strong>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Monetization Model</span>
+                          <strong style={{ fontSize: '13px' }}>{selectedApp.idea?.monetization || selectedApp.monetization || 'Not specified'}</strong>
                         </div>
                         <div style={{ padding: '12px', background: 'var(--paper)', borderRadius: '8px' }}>
-                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Location</span>
-                          <strong style={{ fontSize: '13px' }}>{selectedApp.founderLocation || selectedApp.profile?.location || 'India'}</strong>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Target Geography</span>
+                          <strong style={{ fontSize: '13px' }}>{selectedApp.idea?.geography || selectedApp.geography || selectedApp.founderLocation || 'India'}</strong>
                         </div>
                       </div>
 
-                      {/* FOUNDER SITUATION */}
-                      <div style={{ padding: '12px', background: 'var(--paper)', borderRadius: '8px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Founder Profile &amp; Situation</span>
-                        <strong style={{ fontSize: '13px', textTransform: 'capitalize' }}>
-                          {selectedApp.founderType || selectedApp.profile?.userType || 'Professional with industry thesis'}
-                        </strong>
+                      <div className="grid">
+                        <div style={{ padding: '12px', background: 'var(--paper)', borderRadius: '8px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Team &amp; Co-founders</span>
+                          <strong style={{ fontSize: '13px' }}>{selectedApp.idea?.team || selectedApp.team || 'Solo founder'}</strong>
+                        </div>
+                        <div style={{ padding: '12px', background: 'var(--paper)', borderRadius: '8px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Support Needed</span>
+                          <strong style={{ fontSize: '13px' }}>{selectedApp.idea?.supportNeeded || selectedApp.supportNeeded || 'Technical co-building'}</strong>
+                        </div>
                       </div>
+
+                      {(selectedApp.externalLink || selectedApp.idea?.externalLink) && (
+                        <div style={{ padding: '12px 14px', background: 'var(--paper)', borderRadius: '8px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Demo / External Link (Loom, Figma, GitHub)</span>
+                          <a
+                            href={selectedApp.externalLink || selectedApp.idea?.externalLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: '13px', color: 'var(--brown)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}
+                          >
+                            🔗 {selectedApp.externalLink || selectedApp.idea?.externalLink} ↗
+                          </a>
+                        </div>
+                      )}
+
+                      {(selectedApp.additionalContext || selectedApp.idea?.additionalContext) && (
+                        <div style={{ padding: '12px 14px', background: 'var(--paper)', borderRadius: '8px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'block' }}>Additional Notes &amp; Market Insights</span>
+                          <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--ink-2)', lineHeight: 1.5 }}>
+                            {selectedApp.additionalContext || selectedApp.idea?.additionalContext}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* AI REVIEW ASSESSMENT (IF PRESENT) */}
@@ -1406,7 +1623,9 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                {/* ── TAB 2: LIVE CHAT THREAD ── */}
+                {/* ════════════════════════════════════════════════════
+                    TAB 3: 💬 LIVE CHAT THREAD
+                ════════════════════════════════════════════════════ */}
                 {drawerTab === 'chat' && (
                   <div style={{ display: 'flex', flexDirection: 'column', height: '480px' }}>
                     <div className="chat-messages" style={{ flex: 1, padding: '10px 0', overflowY: 'auto' }}>
@@ -1444,52 +1663,80 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                {/* ── TAB 3: SCHEDULE DILIGENCE CALL ── */}
+                {/* ════════════════════════════════════════════════════
+                    TAB 4: 📅 DILIGENCE MEETINGS FOR THIS VENTURE
+                ════════════════════════════════════════════════════ */}
                 {drawerTab === 'meeting' && (
-                  <form onSubmit={handleBookAdminMeeting} style={{ display: 'grid', gap: '14px' }}>
-                    <div style={{ padding: '12px 14px', background: 'var(--paper)', borderRadius: '10px' }}>
-                      <h4 style={{ margin: '0 0 4px', fontSize: '14px' }}>Book Partner Strategy Session</h4>
-                      <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-2)' }}>
-                        Scheduling will notify the founder and create a confirmed record in the studio schedule.
-                      </p>
-                    </div>
+                  <div style={{ display: 'grid', gap: '16px' }}>
+                    {/* EXISTING MEETINGS LIST */}
+                    {appMeetings.length > 0 && (
+                      <div style={{ padding: '14px', background: 'var(--paper)', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ink-3)', marginBottom: '8px' }}>
+                          Scheduled Diligence Sessions ({appMeetings.length})
+                        </div>
+                        <div style={{ display: 'grid', gap: '8px' }}>
+                          {appMeetings.map((m) => (
+                            <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                              <div>
+                                <strong style={{ fontSize: '13px' }}>{m.date}</strong>
+                                <span style={{ fontSize: '11px', color: 'var(--ink-3)', marginLeft: '8px' }}>{m.timeSlot}</span>
+                                <div style={{ fontSize: '11.5px', color: 'var(--ink-2)', marginTop: '2px' }}>{m.description || m.agenda}</div>
+                              </div>
+                              <span className="badge" style={{ fontSize: '10px', background: 'var(--green-soft)', color: 'var(--green)' }}>
+                                {m.status || 'Confirmed'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                    <div className="field">
-                      <label className="label">Session Date</label>
-                      <input
-                        type="date"
-                        required
-                        value={meetingDate}
-                        onChange={(e) => setMeetingDate(e.target.value)}
-                      />
-                    </div>
+                    {/* SCHEDULE NEW MEETING FORM */}
+                    <form onSubmit={handleBookAdminMeeting} style={{ display: 'grid', gap: '14px', padding: '16px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 4px', fontSize: '14px' }}>Book Partner Strategy Session</h4>
+                        <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-2)' }}>
+                          Scheduling will notify the founder and create a confirmed record in the studio schedule.
+                        </p>
+                      </div>
 
-                    <div className="field">
-                      <label className="label">Time Slot</label>
-                      <select value={meetingSlot} onChange={(e) => setMeetingSlot(e.target.value)}>
-                        <option value="10:00 AM – 10:45 AM IST">10:00 AM – 10:45 AM IST</option>
-                        <option value="11:00 AM – 11:45 AM IST">11:00 AM – 11:45 AM IST</option>
-                        <option value="2:00 PM – 2:45 PM IST">2:00 PM – 2:45 PM IST</option>
-                        <option value="4:00 PM – 4:45 PM IST">4:00 PM – 4:45 PM IST</option>
-                        <option value="5:30 PM – 6:15 PM IST">5:30 PM – 6:15 PM IST</option>
-                      </select>
-                    </div>
+                      <div className="field">
+                        <label className="label">Session Date</label>
+                        <input
+                          type="date"
+                          required
+                          value={meetingDate}
+                          onChange={(e) => setMeetingDate(e.target.value)}
+                        />
+                      </div>
 
-                    <div className="field">
-                      <label className="label">Meeting Agenda &amp; Objective</label>
-                      <textarea
-                        required
-                        value={meetingAgenda}
-                        onChange={(e) => setMeetingAgenda(e.target.value)}
-                        style={{ minHeight: '90px' }}
-                        placeholder="Key diligence topics to cover with the founder..."
-                      />
-                    </div>
+                      <div className="field">
+                        <label className="label">Time Slot</label>
+                        <select value={meetingSlot} onChange={(e) => setMeetingSlot(e.target.value)}>
+                          <option value="10:00 AM – 10:45 AM IST">10:00 AM – 10:45 AM IST</option>
+                          <option value="11:00 AM – 11:45 AM IST">11:00 AM – 11:45 AM IST</option>
+                          <option value="2:00 PM – 2:45 PM IST">2:00 PM – 2:45 PM IST</option>
+                          <option value="4:00 PM – 4:45 PM IST">4:00 PM – 4:45 PM IST</option>
+                          <option value="5:30 PM – 6:15 PM IST">5:30 PM – 6:15 PM IST</option>
+                        </select>
+                      </div>
 
-                    <button type="submit" className="primary" disabled={bookingMeeting} style={{ padding: '12px', width: '100%' }}>
-                      {bookingMeeting ? 'Scheduling...' : 'Confirm Diligence Session →'}
-                    </button>
-                  </form>
+                      <div className="field">
+                        <label className="label">Meeting Agenda &amp; Objective</label>
+                        <textarea
+                          required
+                          value={meetingAgenda}
+                          onChange={(e) => setMeetingAgenda(e.target.value)}
+                          style={{ minHeight: '80px' }}
+                          placeholder="Key diligence topics to cover with the founder..."
+                        />
+                      </div>
+
+                      <button type="submit" className="primary" disabled={bookingMeeting} style={{ padding: '12px', width: '100%' }}>
+                        {bookingMeeting ? 'Scheduling...' : 'Confirm Diligence Session →'}
+                      </button>
+                    </form>
+                  </div>
                 )}
               </div>
 
@@ -1498,14 +1745,14 @@ export default function AdminPage() {
                 <button type="button" className="secondary" onClick={() => setIsDrawerOpen(false)}>
                   Close
                 </button>
-                {drawerTab === 'details' && (selectedApp.status || '').toLowerCase() !== 'approved' && (
+                {(selectedApp.status || '').toLowerCase() !== 'approved' && (
                   <button
                     type="button"
                     className="primary"
-                    onClick={handleQuickApprove}
+                    onClick={triggerApproveModal}
                     disabled={updating}
                   >
-                    Approve Venture →
+                    ✓ Approve Venture →
                   </button>
                 )}
               </div>
@@ -1513,6 +1760,102 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* ════════════════════════════════════════════════════════════════
+          MODAL: MANDATORY APPROVAL COMMENTS DIALOG
+      ════════════════════════════════════════════════════════════════ */}
+      {isApprovalModalOpen && selectedApp && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'grid',
+            placeItems: 'center',
+            zIndex: 1100,
+            padding: '20px'
+          }}
+          onClick={() => !approving && setIsApprovalModalOpen(false)}
+        >
+          <div
+            className="card pad"
+            style={{
+              width: '100%',
+              maxWidth: '560px',
+              background: 'var(--surface)',
+              borderRadius: '16px',
+              boxShadow: 'var(--shadow-lg)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+              <div>
+                <span className="eyebrow" style={{ color: 'var(--green)' }}>✓ Investment Committee Action</span>
+                <h3 style={{ margin: '4px 0 0', fontSize: '20px' }}>Approve Venture for Co-Building</h3>
+                <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--ink-2)' }}>
+                  Venture: <strong>{selectedApp.idea?.title || selectedApp.title || selectedApp.ideaName || 'Untitled'}</strong>
+                  {' · '}Founder: <strong>{selectedApp.founderName || selectedApp.profile?.fullName || 'Founder'}</strong>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => !approving && setIsApprovalModalOpen(false)}
+                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--ink-3)' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ padding: '12px 14px', background: 'var(--cream)', borderRadius: '10px', border: '1px solid var(--brown-soft)', fontSize: '12.5px', color: 'var(--ink-2)', lineHeight: 1.5, marginBottom: '16px' }}>
+              <strong>Mandatory Requirement:</strong> Provide your partner diligence notes and build rationale. These comments will be recorded in the venture audit trail, advance the venture to <strong>Phase 02 Validation</strong>, and be shared with the founder in their console.
+            </div>
+
+            <form onSubmit={handleConfirmApproval}>
+              <div className="field">
+                <label className="label">
+                  Approver Comments &amp; Diligence Rationale <span className="required">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={approvalComment}
+                  onChange={(e) => {
+                    setApprovalComment(e.target.value);
+                    if (approvalError) setApprovalError('');
+                  }}
+                  placeholder="Detail why this venture is approved, strategic synergy with Ideacubator, agreed milestones for Phase 02 Validation, and studio expectations..."
+                  style={{ minHeight: '120px', fontSize: '13.5px' }}
+                />
+                {approvalError && (
+                  <p style={{ color: 'var(--red)', fontSize: '12px', margin: '6px 0 0', fontWeight: 600 }}>
+                    {approvalError}
+                  </p>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setIsApprovalModalOpen(false)}
+                  disabled={approving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="primary"
+                  disabled={approving}
+                  style={{ background: 'var(--green)', borderColor: 'var(--green)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                >
+                  {approving ? 'Approving Venture...' : 'Confirm Approval & Unlock Phase 02 →'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
