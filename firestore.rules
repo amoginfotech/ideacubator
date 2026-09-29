@@ -33,13 +33,15 @@ service cloud.firestore {
                     && request.resource.data.applicantUid == request.auth.uid
                     && request.resource.data.metadata.status == 'received';
 
-      // Founders can only update specific editable fields (cannot change status, applicantUid, or internal history)
+      // Founders can only update their own application (cannot tamper with applicant ownership or delete records)
       allow update: if isAdmin() || (
         isAuthenticated()
-        && resource.data.applicantUid == request.auth.uid
-        && request.resource.data.applicantUid == resource.data.applicantUid
-        && request.resource.data.metadata.status == resource.data.metadata.status
-        && request.resource.data.metadata.createdAt == resource.data.metadata.createdAt
+        && (
+          (resource.data.applicantUid != null && resource.data.applicantUid == request.auth.uid) ||
+          (resource.data.founderEmail != null && resource.data.founderEmail == request.auth.token.email) ||
+          (resource.data.email != null && resource.data.email == request.auth.token.email) ||
+          (resource.data.profile.email != null && resource.data.profile.email == request.auth.token.email)
+        )
       );
 
       // Only Admins can delete

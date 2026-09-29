@@ -39,6 +39,9 @@ export default function DashboardPage() {
   const [drawerIdea, setDrawerIdea] = useState<any | null>(null);
   const [isIdeaDrawerOpen, setIsIdeaDrawerOpen] = useState(false);
   const [drawerTab, setDrawerTab] = useState<'details' | 'chat' | 'meetings'>('details');
+  const [savingIdea, setSavingIdea] = useState(false);
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+  const [docUploadError, setDocUploadError] = useState('');
 
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
   const [isMeetingDrawerOpen, setIsMeetingDrawerOpen] = useState(false);
@@ -245,34 +248,132 @@ export default function DashboardPage() {
     window.location.href = '/';
   };
 
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  };
+
   // Open Drawer for Idea
   const openIdeaDrawer = (app: any, initialTab: 'details' | 'chat' | 'meetings' = 'details') => {
     setSelectedApp(app);
     setDrawerIdea(JSON.parse(JSON.stringify(app)));
     setDrawerTab(initialTab);
+    setDocUploadError('');
     setIsIdeaDrawerOpen(true);
+  };
+
+  // Handle attaching a new document in the idea drawer
+  const handleAttachDrawerFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0 || !user || !drawerIdea) return;
+    const file = e.target.files[0];
+    const validExts = /\.(pdf|doc|docx|ppt|pptx)$/i;
+    if (!validExts.test(file.name)) {
+      setDocUploadError('Supported file formats: PDF, DOC, DOCX, PPT, PPTX only.');
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      setDocUploadError('File exceeds 15MB limit.');
+      return;
+    }
+
+    setDocUploadError('');
+    setIsUploadingDoc(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('applicantUid', user.uid);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) throw new Error('Upload service returned error');
+      const data = await res.json();
+
+      const newDoc = {
+        name: file.name,
+        size: file.size,
+        storagePath: data.storagePath,
+        downloadUrl: data.downloadUrl,
+        uploadedAt: data.uploadedAt || new Date().toISOString()
+      };
+
+      const updatedDocs = [...(drawerIdea.documents || []), newDoc];
+      setDrawerIdea((prev: any) => ({ ...prev, documents: updatedDocs }));
+      showToast(`Attached "${file.name}". Click "Save Changes" to save.`);
+    } catch (err: any) {
+      console.error('Drawer document upload failed:', err);
+      setDocUploadError('Failed to upload file: ' + (err.message || 'Please try again.'));
+    } finally {
+      setIsUploadingDoc(false);
+      e.target.value = '';
+    }
+  };
+
+  // Handle removing a document from the idea drawer
+  const handleRemoveDrawerDoc = (index: number) => {
+    if (!drawerIdea) return;
+    const updatedDocs = (drawerIdea.documents || []).filter((_: any, i: number) => i !== index);
+    setDrawerIdea((prev: any) => ({ ...prev, documents: updatedDocs }));
+    showToast('Document removed. Click "Save Changes" to apply.');
   };
 
   // Save Idea Edits
   const handleSaveDrawerIdea = async () => {
     if (!drawerIdea || !drawerIdea.id) return;
+    setSavingIdea(true);
     try {
       const appRef = doc(db, 'applications', drawerIdea.id);
-      await updateDoc(appRef, {
-        'idea.title': drawerIdea.idea?.title || drawerIdea.title || 'Untitled Venture',
-        'idea.description': drawerIdea.idea?.description || drawerIdea.description || '',
-        'idea.problem': drawerIdea.idea?.problem || drawerIdea.problem || '',
-        'idea.customer': drawerIdea.idea?.customer || drawerIdea.customer || '',
-        'idea.currentStage': drawerIdea.idea?.currentStage || drawerIdea.currentStage || 'Idea only',
-        'idea.monetization': drawerIdea.idea?.monetization || drawerIdea.monetization || '',
-        'idea.traction': drawerIdea.idea?.traction || drawerIdea.traction || '',
-        'idea.geography': drawerIdea.idea?.geography || drawerIdea.geography || '',
+      const newTitle = drawerIdea.idea?.title || drawerIdea.title || 'Untitled Venture';
+      const newDesc = drawerIdea.idea?.description || drawerIdea.description || '';
+      const newProb = drawerIdea.idea?.problem || drawerIdea.problem || '';
+      const newCust = drawerIdea.idea?.customer || drawerIdea.customer || '';
+      const newStageStr = drawerIdea.idea?.currentStage || drawerIdea.currentStage || 'Idea only';
+      const newMonetization = drawerIdea.idea?.monetization || drawerIdea.monetization || '';
+      const newTraction = drawerIdea.idea?.traction || drawerIdea.traction || '';
+      const newGeography = drawerIdea.idea?.geography || drawerIdea.geography || '';
+      const newDocs = Array.isArray(drawerIdea.documents) ? drawerIdea.documents : [];
+
+      const updates: any = {
+        title: newTitle,
+        ideaName: newTitle,
+        description: newDesc,
+        ideaSummary: newDesc,
+        problem: newProb,
+        customer: newCust,
+        documents: newDocs,
+        idea: {
+          ...(drawerIdea.idea || {}),
+          title: newTitle,
+          description: newDesc,
+          problem: newProb,
+          customer: newCust,
+          currentStage: newStageStr,
+          monetization: newMonetization,
+          traction: newTraction,
+          geography: newGeography
+        },
         'metadata.updatedAt': serverTimestamp()
-      });
-      showToast('Venture details updated successfully.');
+      };
+
+      await updateDoc(appRef, updates);
+
+      // Immediately update local application & selectedApp states
+      setSelectedApp((prev: any) => (prev ? { ...prev, ...updates } : prev));
+      setApplications((prev) =>
+        prev.map((item) => (item.id === drawerIdea.id ? { ...item, ...updates } : item))
+      );
+
+      showToast('Venture details and documents updated successfully.');
       setIsIdeaDrawerOpen(false);
     } catch (err: any) {
-      alert('Failed to update idea: ' + err.message);
+      console.error('Failed to update idea in Firestore:', err);
+      alert('Failed to update idea: ' + (err.message || 'Please check your connection and try again.'));
+    } finally {
+      setSavingIdea(false);
     }
   };
 
@@ -1398,6 +1499,24 @@ export default function DashboardPage() {
                         style={{ minHeight: '70px' }}
                       />
                     </div>
+
+                    {/* Attached Documents Quick Summary in Details Tab */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--paper)', borderRadius: '10px', border: '1px solid var(--line)', marginTop: '4px' }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 600 }}>Pitch Decks &amp; Documents</div>
+                        <div style={{ fontSize: '12px', color: 'var(--ink-3)' }}>
+                          {(drawerIdea.documents || []).length} file(s) attached
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="secondary"
+                        onClick={() => setDrawerTab('meetings')}
+                        style={{ fontSize: '11px', padding: '6px 12px' }}
+                      >
+                        Manage &amp; Attach Files →
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -1434,25 +1553,123 @@ export default function DashboardPage() {
                   </div>
                 )}
 
+                {/* ── TAB 3: MATERIALS & DOCUMENTS MANAGEMENT ── */}
                 {drawerTab === 'meetings' && (
                   <div>
-                    <h4 style={{ margin: '0 0 12px' }}>Pitch Decks &amp; Materials</h4>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '15px' }}>Pitch Decks &amp; Supplementary Materials</h4>
+                        <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--ink-3)' }}>
+                          Upload new pitch decks, financial models, or remove outdated documents.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* EXISTING DOCUMENTS LIST */}
                     {drawerIdea.documents && drawerIdea.documents.length > 0 ? (
-                      <div style={{ display: 'grid', gap: '8px' }}>
+                      <div style={{ display: 'grid', gap: '8px', marginBottom: '20px' }}>
                         {drawerIdea.documents.map((doc: any, i: number) => (
-                          <div key={i} className="file">
-                            <span>📄 {doc.name || 'Document'}</span>
-                            {doc.downloadUrl && (
-                              <a href={doc.downloadUrl} target="_blank" rel="noopener noreferrer" className="text-btn">
-                                Download
-                              </a>
-                            )}
+                          <div
+                            key={i}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '10px 14px',
+                              background: 'var(--paper)',
+                              borderRadius: '10px',
+                              border: '1px solid var(--line)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+                              <span style={{ fontSize: '18px' }}>📄</span>
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {doc.name || 'Document'}
+                                </div>
+                                <div style={{ fontSize: '11px', color: 'var(--ink-3)', display: 'flex', gap: '8px' }}>
+                                  {doc.size ? <span>{formatFileSize(doc.size)}</span> : null}
+                                  {doc.uploadedAt ? (
+                                    <span>• {new Date(doc.uploadedAt).toLocaleDateString()}</span>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
+                              {doc.downloadUrl && (
+                                <a
+                                  href={doc.downloadUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="secondary"
+                                  style={{ fontSize: '11px', padding: '5px 10px', textDecoration: 'none' }}
+                                >
+                                  Download ↗
+                                </a>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveDrawerDoc(i)}
+                                title="Remove document"
+                                style={{
+                                  background: 'var(--red-soft)',
+                                  color: 'var(--red)',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  padding: '5px 9px',
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                ✕ Remove
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p style={{ color: 'var(--ink-3)', fontSize: '13px' }}>No documents uploaded for this venture.</p>
+                      <div style={{ textAlign: 'center', padding: '24px 16px', background: 'var(--paper)', borderRadius: '10px', border: '1px dashed var(--line)', marginBottom: '16px' }}>
+                        <p style={{ color: 'var(--ink-3)', fontSize: '13px', margin: 0 }}>No documents currently attached to this venture.</p>
+                      </div>
                     )}
+
+                    {/* ATTACH NEW DOCUMENT DROP/UPLOAD AREA */}
+                    <div style={{ padding: '16px', border: '2px dashed var(--line)', borderRadius: '12px', textAlign: 'center', background: 'var(--paper)' }}>
+                      <input
+                        type="file"
+                        id="drawerAttachFileInput"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx"
+                        style={{ display: 'none' }}
+                        onChange={handleAttachDrawerFile}
+                        disabled={isUploadingDoc}
+                      />
+                      <label
+                        htmlFor="drawerAttachFileInput"
+                        style={{
+                          cursor: isUploadingDoc ? 'not-allowed' : 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '10px 18px',
+                          background: 'var(--ink)',
+                          color: 'var(--paper)',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          fontWeight: 600
+                        }}
+                      >
+                        {isUploadingDoc ? '⏳ Uploading Document...' : '📎 Attach New Pitch Deck / Document'}
+                      </label>
+                      <p style={{ margin: '8px 0 0', fontSize: '11px', color: 'var(--ink-3)' }}>
+                        Supported formats: PDF, DOC, DOCX, PPT, PPTX (up to 15MB)
+                      </p>
+                      {docUploadError && (
+                        <p style={{ margin: '8px 0 0', fontSize: '12px', color: 'var(--red)', fontWeight: 500 }}>
+                          {docUploadError}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1462,9 +1679,14 @@ export default function DashboardPage() {
                 <button type="button" className="secondary" onClick={() => setIsIdeaDrawerOpen(false)}>
                   Close
                 </button>
-                {drawerTab === 'details' && (
-                  <button type="button" className="primary" onClick={handleSaveDrawerIdea}>
-                    Save Changes →
+                {(drawerTab === 'details' || drawerTab === 'meetings') && (
+                  <button
+                    type="button"
+                    className="primary"
+                    onClick={handleSaveDrawerIdea}
+                    disabled={savingIdea || isUploadingDoc}
+                  >
+                    {savingIdea ? 'Saving Changes...' : 'Save Changes →'}
                   </button>
                 )}
               </div>
