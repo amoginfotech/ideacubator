@@ -303,7 +303,23 @@ export default function DashboardPage() {
 
       const updatedDocs = [...(drawerIdea.documents || []), newDoc];
       setDrawerIdea((prev: any) => ({ ...prev, documents: updatedDocs }));
-      showToast(`Attached "${file.name}". Click "Save Changes" to save.`);
+
+      // Auto-sync document attachment to Firestore immediately
+      try {
+        const appRef = doc(db, 'applications', drawerIdea.id);
+        await updateDoc(appRef, {
+          documents: updatedDocs,
+          'metadata.updatedAt': serverTimestamp()
+        });
+        setSelectedApp((prev: any) => (prev ? { ...prev, documents: updatedDocs } : prev));
+        setApplications((prev) =>
+          prev.map((item) => (item.id === drawerIdea.id ? { ...item, documents: updatedDocs } : item))
+        );
+      } catch (syncErr) {
+        console.warn('Auto-sync document attachment notice:', syncErr);
+      }
+
+      showToast(`Attached "${file.name}" to venture.`);
     } catch (err: any) {
       console.error('Drawer document upload failed:', err);
       setDocUploadError('Failed to upload file: ' + (err.message || 'Please try again.'));
@@ -314,27 +330,48 @@ export default function DashboardPage() {
   };
 
   // Handle removing a document from the idea drawer
-  const handleRemoveDrawerDoc = (index: number) => {
+  const handleRemoveDrawerDoc = async (index: number) => {
     if (!drawerIdea) return;
     const updatedDocs = (drawerIdea.documents || []).filter((_: any, i: number) => i !== index);
     setDrawerIdea((prev: any) => ({ ...prev, documents: updatedDocs }));
-    showToast('Document removed. Click "Save Changes" to apply.');
+
+    // Auto-sync document removal to Firestore immediately
+    try {
+      const appRef = doc(db, 'applications', drawerIdea.id);
+      await updateDoc(appRef, {
+        documents: updatedDocs,
+        'metadata.updatedAt': serverTimestamp()
+      });
+      setSelectedApp((prev: any) => (prev ? { ...prev, documents: updatedDocs } : prev));
+      setApplications((prev) =>
+        prev.map((item) => (item.id === drawerIdea.id ? { ...item, documents: updatedDocs } : item))
+      );
+    } catch (syncErr) {
+      console.warn('Auto-sync document removal notice:', syncErr);
+    }
+
+    showToast('Document removed from venture.');
   };
 
-  // Save Idea Edits
+  // Save Idea Edits (Persists across all tabs: details, materials, links, notes)
   const handleSaveDrawerIdea = async () => {
     if (!drawerIdea || !drawerIdea.id) return;
     setSavingIdea(true);
     try {
       const appRef = doc(db, 'applications', drawerIdea.id);
-      const newTitle = drawerIdea.idea?.title || drawerIdea.title || 'Untitled Venture';
-      const newDesc = drawerIdea.idea?.description || drawerIdea.description || '';
+      const newTitle = drawerIdea.idea?.title || drawerIdea.title || drawerIdea.ideaName || 'Untitled Venture';
+      const newDesc = drawerIdea.idea?.description || drawerIdea.description || drawerIdea.ideaSummary || '';
       const newProb = drawerIdea.idea?.problem || drawerIdea.problem || '';
       const newCust = drawerIdea.idea?.customer || drawerIdea.customer || '';
       const newStageStr = drawerIdea.idea?.currentStage || drawerIdea.currentStage || 'Idea only';
       const newMonetization = drawerIdea.idea?.monetization || drawerIdea.monetization || '';
       const newTraction = drawerIdea.idea?.traction || drawerIdea.traction || '';
       const newGeography = drawerIdea.idea?.geography || drawerIdea.geography || '';
+      const newTeam = drawerIdea.idea?.team || drawerIdea.team || '';
+      const newCommitment = drawerIdea.idea?.founderCommitment || drawerIdea.founderCommitment || '';
+      const newSupport = drawerIdea.idea?.supportNeeded || drawerIdea.supportNeeded || '';
+      const newExternalLink = drawerIdea.externalLink || drawerIdea.idea?.externalLink || '';
+      const newAdditionalContext = drawerIdea.additionalContext || drawerIdea.idea?.additionalContext || '';
       const newDocs = Array.isArray(drawerIdea.documents) ? drawerIdea.documents : [];
 
       const updates: any = {
@@ -344,6 +381,8 @@ export default function DashboardPage() {
         ideaSummary: newDesc,
         problem: newProb,
         customer: newCust,
+        externalLink: newExternalLink,
+        additionalContext: newAdditionalContext,
         documents: newDocs,
         idea: {
           ...(drawerIdea.idea || {}),
@@ -354,7 +393,12 @@ export default function DashboardPage() {
           currentStage: newStageStr,
           monetization: newMonetization,
           traction: newTraction,
-          geography: newGeography
+          geography: newGeography,
+          team: newTeam,
+          founderCommitment: newCommitment,
+          supportNeeded: newSupport,
+          externalLink: newExternalLink,
+          additionalContext: newAdditionalContext
         },
         'metadata.updatedAt': serverTimestamp()
       };
@@ -367,7 +411,7 @@ export default function DashboardPage() {
         prev.map((item) => (item.id === drawerIdea.id ? { ...item, ...updates } : item))
       );
 
-      showToast('Venture details and documents updated successfully.');
+      showToast('All venture details, documents, and notes saved successfully.');
       setIsIdeaDrawerOpen(false);
     } catch (err: any) {
       console.error('Failed to update idea in Firestore:', err);
@@ -1404,37 +1448,44 @@ export default function DashboardPage() {
               <div className="drawer-body">
                 {drawerTab === 'details' && (
                   <div style={{ display: 'grid', gap: '14px' }}>
+                    {/* 1. VENTURE WORKING TITLE */}
                     <div className="field">
-                      <label className="label">Venture Working Title</label>
+                      <label className="label">Venture Working Title <span className="required">*</span></label>
                       <input
-                        value={drawerIdea.idea?.title || drawerIdea.title || ''}
+                        value={drawerIdea.idea?.title || drawerIdea.title || drawerIdea.ideaName || ''}
                         onChange={(e) =>
                           setDrawerIdea({
                             ...drawerIdea,
                             title: e.target.value,
+                            ideaName: e.target.value,
                             idea: { ...(drawerIdea.idea || {}), title: e.target.value }
                           })
                         }
+                        placeholder="e.g. HealthBridge AI"
                       />
                     </div>
 
+                    {/* 2. SOLUTION & PRODUCT CONCEPT */}
                     <div className="field">
-                      <label className="label">Idea Description</label>
+                      <label className="label">Solution &amp; Core Concept <span className="required">*</span></label>
                       <textarea
-                        value={drawerIdea.idea?.description || drawerIdea.description || ''}
+                        value={drawerIdea.idea?.description || drawerIdea.description || drawerIdea.ideaSummary || ''}
                         onChange={(e) =>
                           setDrawerIdea({
                             ...drawerIdea,
                             description: e.target.value,
+                            ideaSummary: e.target.value,
                             idea: { ...(drawerIdea.idea || {}), description: e.target.value }
                           })
                         }
                         style={{ minHeight: '90px' }}
+                        placeholder="What are you building? Describe the core product, workflow, and technology..."
                       />
                     </div>
 
+                    {/* 3. PROBLEM STATEMENT */}
                     <div className="field">
-                      <label className="label">Problem Statement</label>
+                      <label className="label">Problem Statement &amp; Daily Friction</label>
                       <textarea
                         value={drawerIdea.idea?.problem || drawerIdea.problem || ''}
                         onChange={(e) =>
@@ -1445,12 +1496,14 @@ export default function DashboardPage() {
                           })
                         }
                         style={{ minHeight: '80px' }}
+                        placeholder="What is painful, slow, expensive, or broken in the industry today?"
                       />
                     </div>
 
+                    {/* 4. TARGET CUSTOMER & STAGE */}
                     <div className="grid">
                       <div className="field">
-                        <label className="label">Target Customer</label>
+                        <label className="label">Target Customer / Beachhead Market</label>
                         <input
                           value={drawerIdea.idea?.customer || drawerIdea.customer || ''}
                           onChange={(e) =>
@@ -1460,10 +1513,12 @@ export default function DashboardPage() {
                               idea: { ...(drawerIdea.idea || {}), customer: e.target.value }
                             })
                           }
+                          placeholder="e.g. Mid-market healthcare clinics"
                         />
                       </div>
+
                       <div className="field">
-                        <label className="label">Current Stage</label>
+                        <label className="label">Current Development Stage</label>
                         <select
                           value={drawerIdea.idea?.currentStage || drawerIdea.currentStage || 'Idea only'}
                           onChange={(e) =>
@@ -1485,8 +1540,9 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
+                    {/* 5. TRACTION & EVIDENCE */}
                     <div className="field">
-                      <label className="label">Traction &amp; Evidence</label>
+                      <label className="label">Traction &amp; Early Validation Evidence</label>
                       <textarea
                         value={drawerIdea.idea?.traction || drawerIdea.traction || ''}
                         onChange={(e) =>
@@ -1497,13 +1553,134 @@ export default function DashboardPage() {
                           })
                         }
                         style={{ minHeight: '70px' }}
+                        placeholder="Letters of intent, waitlist signups, pilot users, customer interview findings, or ARR..."
                       />
                     </div>
 
-                    {/* Attached Documents Quick Summary in Details Tab */}
+                    {/* 6. MONETIZATION & GEOGRAPHY */}
+                    <div className="grid">
+                      <div className="field">
+                        <label className="label">Monetization &amp; Business Model</label>
+                        <input
+                          value={drawerIdea.idea?.monetization || drawerIdea.monetization || ''}
+                          onChange={(e) =>
+                            setDrawerIdea({
+                              ...drawerIdea,
+                              monetization: e.target.value,
+                              idea: { ...(drawerIdea.idea || {}), monetization: e.target.value }
+                            })
+                          }
+                          placeholder="e.g. B2B SaaS $499/mo, 1.5% take rate"
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="label">Target Market Geography</label>
+                        <input
+                          value={drawerIdea.idea?.geography || drawerIdea.geography || ''}
+                          onChange={(e) =>
+                            setDrawerIdea({
+                              ...drawerIdea,
+                              geography: e.target.value,
+                              idea: { ...(drawerIdea.idea || {}), geography: e.target.value }
+                            })
+                          }
+                          placeholder="e.g. India &amp; North America"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 7. TEAM STRUCTURE & COMMITMENT */}
+                    <div className="grid">
+                      <div className="field">
+                        <label className="label">Team Structure &amp; Co-founders</label>
+                        <input
+                          value={drawerIdea.idea?.team || drawerIdea.team || ''}
+                          onChange={(e) =>
+                            setDrawerIdea({
+                              ...drawerIdea,
+                              team: e.target.value,
+                              idea: { ...(drawerIdea.idea || {}), team: e.target.value }
+                            })
+                          }
+                          placeholder="e.g. Solo founder seeking CTO"
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="label">Founder Commitment</label>
+                        <select
+                          value={drawerIdea.idea?.founderCommitment || drawerIdea.founderCommitment || 'Full-time founder'}
+                          onChange={(e) =>
+                            setDrawerIdea({
+                              ...drawerIdea,
+                              founderCommitment: e.target.value,
+                              idea: { ...(drawerIdea.idea || {}), founderCommitment: e.target.value }
+                            })
+                          }
+                        >
+                          <option value="Full-time founder">Full-time founder</option>
+                          <option value="Part-time (transitioning)">Part-time (transitioning)</option>
+                          <option value="Nights &amp; Weekends">Nights &amp; Weekends</option>
+                          <option value="Investor / Executive sponsor">Investor / Executive sponsor</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 8. SUPPORT NEEDED */}
+                    <div className="field">
+                      <label className="label">Support Expected from Ideacubator</label>
+                      <input
+                        value={drawerIdea.idea?.supportNeeded || drawerIdea.supportNeeded || ''}
+                        onChange={(e) =>
+                          setDrawerIdea({
+                            ...drawerIdea,
+                            supportNeeded: e.target.value,
+                            idea: { ...(drawerIdea.idea || {}), supportNeeded: e.target.value }
+                          })
+                        }
+                        placeholder="e.g. Full technical co-builder, AI agent architecture, customer intro &amp; seed capital"
+                      />
+                    </div>
+
+                    {/* 9. DEMO / EXTERNAL LINK */}
+                    <div className="field">
+                      <label className="label">Demo / External Link (Figma, Loom, GitHub)</label>
+                      <input
+                        type="url"
+                        value={drawerIdea.externalLink || drawerIdea.idea?.externalLink || ''}
+                        onChange={(e) =>
+                          setDrawerIdea({
+                            ...drawerIdea,
+                            externalLink: e.target.value,
+                            idea: { ...(drawerIdea.idea || {}), externalLink: e.target.value }
+                          })
+                        }
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    {/* 10. ADDITIONAL CONTEXT / THESIS NOTES */}
+                    <div className="field">
+                      <label className="label">Additional Notes &amp; Market Insights</label>
+                      <textarea
+                        value={drawerIdea.additionalContext || drawerIdea.idea?.additionalContext || ''}
+                        onChange={(e) =>
+                          setDrawerIdea({
+                            ...drawerIdea,
+                            additionalContext: e.target.value,
+                            idea: { ...(drawerIdea.idea || {}), additionalContext: e.target.value }
+                          })
+                        }
+                        style={{ minHeight: '65px' }}
+                        placeholder="Any other data, competitor analysis, or context for the studio review team..."
+                      />
+                    </div>
+
+                    {/* 11. Attached Documents Quick Summary in Details Tab */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--paper)', borderRadius: '10px', border: '1px solid var(--line)', marginTop: '4px' }}>
                       <div>
-                        <div style={{ fontSize: '13px', fontWeight: 600 }}>Pitch Decks &amp; Documents</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600 }}>Pitch Decks &amp; Attached Files</div>
                         <div style={{ fontSize: '12px', color: 'var(--ink-3)' }}>
                           {(drawerIdea.documents || []).length} file(s) attached
                         </div>
@@ -1679,16 +1856,15 @@ export default function DashboardPage() {
                 <button type="button" className="secondary" onClick={() => setIsIdeaDrawerOpen(false)}>
                   Close
                 </button>
-                {(drawerTab === 'details' || drawerTab === 'meetings') && (
-                  <button
-                    type="button"
-                    className="primary"
-                    onClick={handleSaveDrawerIdea}
-                    disabled={savingIdea || isUploadingDoc}
-                  >
-                    {savingIdea ? 'Saving Changes...' : 'Save Changes →'}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="primary"
+                  onClick={handleSaveDrawerIdea}
+                  disabled={savingIdea || isUploadingDoc}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                >
+                  {savingIdea ? 'Saving All Venture Changes...' : 'Save All Venture Changes →'}
+                </button>
               </div>
             </>
           )}
