@@ -6,6 +6,7 @@ import Link from 'next/link';
 export default function InvestPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,15 +21,50 @@ export default function InvestPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errorMsg) setErrorMsg(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
+    setErrorMsg(null);
+
+    try {
+      const res = await fetch('/api/send-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'invest',
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          firm: formData.firm.trim(),
+          investorType: formData.investorType,
+          ticketSize: formData.ticketSize,
+          geography: formData.geography,
+          focusSectors: formData.focusSectors,
+          linkedin: formData.linkedin.trim(),
+          notes: formData.notes.trim()
+        })
+      });
+
+      let result: any = null;
+      try {
+        result = await res.json();
+      } catch {
+        // Handled below if !res.ok
+      }
+
+      if (!res.ok) {
+        throw new Error(result?.error || `Server responded with status ${res.status}. Please email invest@ideacubator.in directly.`);
+      }
+
       setSubmitted(true);
-    }, 800);
+    } catch (err: any) {
+      console.error('[Invest Submit Error]', err);
+      setErrorMsg(err.message || 'There was an issue registering your profile. Please email invest@ideacubator.in directly.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -203,6 +239,12 @@ export default function InvestPage() {
                     />
                   </div>
                 </div>
+
+                {errorMsg && (
+                  <div style={{ marginTop: '16px', padding: '12px 16px', borderRadius: '8px', background: 'var(--red-soft, #fde8e8)', border: '1px solid var(--red, #e02424)', color: 'var(--red, #9b1c1c)', fontSize: '13px' }}>
+                    ⚠️ {errorMsg}
+                  </div>
+                )}
 
                 <div style={{ marginTop: '24px' }}>
                   <button

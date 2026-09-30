@@ -7,14 +7,17 @@ import WhatsAppChatWidget from '@/components/WhatsAppChatWidget';
 export const metadata: Metadata = {
   metadataBase: new URL('https://ideacubator.in'),
   title: {
-    default: 'Ideacubator — Ideas into Companies | Hands-On Venture Studio',
+    default: 'Ideacubator | Hands-On Venture Studio & AI Technical Co-Builder | Bangalore',
     template: '%s — Ideacubator'
   },
   description:
-    'Ideacubator is a hands-on venture studio and technical co-builder. We turn high-conviction ideas into enduring companies through disciplined validation, product engineering, and go-to-market execution.',
+    'Ideacubator partners with founders and domain experts to build scalable ventures. Full-stack engineering, applied AI, product strategy, and GTM execution in Bangalore, India.',
   keywords: [
-    'venture studio',
-    'technical co-founder',
+    'venture studio Bangalore',
+    'venture studio India',
+    'AI co-builder',
+    'technical co-founder Bangalore',
+    'AI technical co-builder',
     'startup incubator India',
     'early stage venture builder',
     'MVP development',
@@ -38,24 +41,24 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Ideacubator',
     url: 'https://ideacubator.in',
-    title: 'Ideacubator — Ideas into Companies | Hands-On Venture Studio',
+    title: 'Ideacubator — Turn Ideas into Scalable Companies',
     description:
-      'Hands-on venture studio and technical co-builder. We partner with founders from day zero to architect, build, launch, and scale enduring ventures.',
+      'Hands-on technical venture studio in Bangalore. We build production-grade software, AI workflows, and GTM strategies for founders and domain experts.',
     images: [
       {
         url: 'https://ideacubator.in/assets/img/og-preview.jpg',
         width: 1200,
         height: 630,
-        alt: 'Ideacubator — Ideas into Companies'
+        alt: 'Ideacubator — Turn Ideas into Scalable Companies'
       }
     ],
     locale: 'en_US'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ideacubator — Ideas into Companies | Hands-On Venture Studio',
+    title: 'Ideacubator — Turn Ideas into Scalable Companies',
     description:
-      'Hands-on venture studio and technical co-builder turning high-conviction ideas into enduring companies.',
+      'Hands-on technical venture studio in Bangalore. We build production-grade software, AI workflows, and GTM strategies for founders and domain experts.',
     images: ['https://ideacubator.in/assets/img/og-preview.jpg']
   }
 };

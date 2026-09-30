@@ -668,7 +668,6 @@ export default function SubmitIdeaPage() {
                           <option value="seed">I’ve built a product and I’m ready to raise funding</option>
                           <option value="vc">My business is making money and I’m ready to scale</option>
                           <option value="sell">I want to explore selling my business</option>
-                          <option value="ipo">I want to explore taking my company public</option>
                           <option value="test">I want to test my idea before a bigger commitment</option>
                           <option value="value">I need my business valued</option>
                           <option value="intl-out">I want to expand my Indian business internationally</option>
@@ -1176,22 +1175,22 @@ export default function SubmitIdeaPage() {
                               ? profile.userType === 'student'
                                 ? 'Student founder'
                                 : profile.userType === 'professional'
-                                ? 'Industry professional looking for tech co-builder'
-                                : profile.userType === 'seed'
-                                ? 'Seed stage — product built, ready for capital'
-                                : profile.userType === 'vc'
-                                ? 'Growth stage — revenue generating, scaling'
-                                : profile.userType === 'sell'
-                                ? 'Exploring sale / acquisition'
-                                : profile.userType === 'ipo'
-                                ? 'Exploring public listing / IPO'
-                                : profile.userType === 'test'
-                                ? 'Testing idea with low risk'
-                                : profile.userType === 'value'
-                                ? 'Valuation & advisory inquiry'
-                                : profile.userType === 'intl-out'
-                                ? 'Indian company expanding internationally'
-                                : 'International business entering India'
+                                  ? 'Industry professional looking for tech co-builder'
+                                  : profile.userType === 'seed'
+                                    ? 'Seed stage — product built, ready for capital'
+                                    : profile.userType === 'vc'
+                                      ? 'Growth stage — revenue generating, scaling'
+                                      : profile.userType === 'sell'
+                                        ? 'Exploring sale / acquisition'
+                                        : profile.userType === 'ipo'
+                                          ? 'Exploring public listing / IPO'
+                                          : profile.userType === 'test'
+                                            ? 'Testing idea with low risk'
+                                            : profile.userType === 'value'
+                                              ? 'Valuation & advisory inquiry'
+                                              : profile.userType === 'intl-out'
+                                                ? 'Indian company expanding internationally'
+                                                : 'International business entering India'
                               : 'Not selected'}
                           </span>
                         </div>

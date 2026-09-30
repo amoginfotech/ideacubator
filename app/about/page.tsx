@@ -104,8 +104,14 @@ export default function AboutPage() {
             <p style={{ color: 'var(--ink-2)', fontSize: '15px', lineHeight: 1.65, margin: '0 0 14px' }}>
               His industry experience spans <strong>financial services and healthcare</strong>—two of the world’s most demanding, heavily regulated, and high-consequence domains. In these environments, reliability, architectural clarity, and data privacy are absolute necessities.
             </p>
-            <p style={{ color: 'var(--ink-2)', fontSize: '15px', lineHeight: 1.65, margin: '0 0 20px' }}>
+            <p style={{ color: 'var(--ink-2)', fontSize: '15px', lineHeight: 1.65, margin: '0 0 14px' }}>
               For the past <strong>five-plus years</strong>, his focus has been dedicated to <strong>AI and AI-powered product development</strong>, investigating how modern LLMs, automated agentic pipelines, and machine intelligence reshape business mechanics and unlock unprecedented speed to market.
+            </p>
+            <p style={{ color: 'var(--ink-2)', fontSize: '15px', lineHeight: 1.65, margin: '0 0 14px' }}>
+              A prolific builder at heart, he has architected and delivered numerous <strong>production MVPs</strong>—both for in-house venture incubation and commercial client engagements. His commercial background includes driving <strong>business development and expanding high-growth revenue streams across APAC</strong> for an American mid-scale technology enterprise.
+            </p>
+            <p style={{ color: 'var(--ink-2)', fontSize: '15px', lineHeight: 1.65, margin: '0 0 20px' }}>
+              As a dedicated mentor in the startup ecosystem, Brijesh has guided founders through the complete arc from <strong>initial ideation to working MVP</strong>. He has also advised and supported emerging startups on legal entity establishment, governance, and official registration through government boards and industry bodies including <strong>NASSCOM</strong>.
             </p>
 
             <div className="chips-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '24px' }}>
@@ -114,6 +120,10 @@ export default function AboutPage() {
               <span className="chip-item">Financial Services</span>
               <span className="chip-item">Healthcare Technology</span>
               <span className="chip-item">AI Product Engineering</span>
+              <span className="chip-item">MVP Development</span>
+              <span className="chip-item">APAC Revenue &amp; Business Dev</span>
+              <span className="chip-item">Startup Mentorship (Ideation to MVP)</span>
+              <span className="chip-item">Entity Legal Setup &amp; NASSCOM</span>
               <span className="chip-item">Global Cross-Border Delivery</span>
               <span className="chip-item">Product Strategy</span>
             </div>

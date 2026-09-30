@@ -48,7 +48,7 @@ export default function HomePage() {
     },
     {
       q: 'What if I only want to test market appetite before leaving my job?',
-      a: 'We offer low-risk Validation Sprints (Starting Point 05) specifically designed to test problem severity, buyer willingness-to-pay, and market signal before committing capital or making major career transitions.'
+      a: 'We offer low-risk Validation Sprints (Starting Point 03) specifically designed to test problem severity, buyer willingness-to-pay, and market signal before committing capital or making major career transitions.'
     },
     {
       q: 'Does Ideacubator invest capital directly or help raise funding?',
@@ -97,54 +97,44 @@ export default function HomePage() {
 
   const startingPoints = [
     {
-      num: '01 · Student Innovators',
-      title: 'Campus Founders',
-      desc: 'For students and researchers with breakthrough ideas who need seasoned engineering, structured mentorship, and validation discipline.'
+      num: '01 · Campus Founders',
+      title: 'Student Innovators & Researchers',
+      desc: 'Validation discipline, structured mentorship, and hands-on technical co-building for breakthrough ideas.'
     },
     {
       num: '02 · Domain Professionals',
-      title: 'Professionals with Ideas',
-      desc: 'For experienced corporate executives, doctors, and specialists with deep domain insights who need an expert technical team to build the venture.'
+      title: 'Executives & Industry Specialists',
+      desc: 'Transforming deep domain insights into scalable software products with an expert engineering and AI co-builder team.'
     },
     {
-      num: '03 · Ready for Capital',
-      title: 'Product Built & Ready to Raise',
-      desc: 'For founders who have an initial product and need capital readiness, financial structuring, and direct introductions to active angel and seed funds.'
+      num: '03 · Low-Risk Testing',
+      title: 'Idea Validation Sprints',
+      desc: 'Fast, targeted testing of market appetite, customer demand, and willingness-to-pay before committing major capital.'
     },
     {
       num: '04 · Growth & Scaling',
-      title: 'Revenue-Generating Ventures',
-      desc: 'For businesses generating steady revenue that need enterprise-grade software architecture, AI automation, and scalable systems to expand 10x.'
+      title: 'AI & Product Modernization',
+      desc: 'Upgrading existing products with enterprise cloud architecture, custom LLM workflows, and automated systems to scale 10x.'
     },
     {
-      num: '05 · Low-Risk Testing',
-      title: 'Idea Validation Sprints',
-      desc: 'For builders who want to test market appetite, customer willingness to pay, and product feasibility before committing life savings or quitting jobs.'
+      num: '05 · Ready for Capital',
+      title: 'Pre-Seed & Angel Readiness',
+      desc: 'Product polish, analytics instrumentation, financial modeling, and clean data room preparation for early funding rounds.'
     },
     {
-      num: '06 · Strategic Exits',
-      title: 'M&A & Business Sale',
-      desc: 'For business owners seeking strategic acquisition, tech modernization prior to sale, or seamless transition to new institutional ownership.'
+      num: '06 · Valuation & Audits',
+      title: 'Venture & Tech Valuation',
+      desc: 'Fundamental code health checks, software architecture stress-testing, IP asset evaluation, and commercial viability audits.'
     },
     {
-      num: '07 · Capital Markets',
-      title: 'IPO Readiness & Governance',
-      desc: 'For mature companies preparing for public markets, SME exchange listings, institutional audit compliance, and tech modernization.'
+      num: '07 · India to Global',
+      title: 'Cross-Border Outbound (Global & GCC)',
+      desc: 'Helping proven Indian products expand into APAC, North America, Europe, and GCC markets with localized GTM and tech positioning.'
     },
     {
-      num: '08 · Valuation & Diligence',
-      title: 'Business & Tech Valuation',
-      desc: 'For startups needing comprehensive technology audits, IP asset valuation, and commercial viability health checks.'
-    },
-    {
-      num: '09 · India to Global',
-      title: 'Cross-Border Outbound',
-      desc: 'For proven Indian products expanding into North America, Europe, and APAC with localized GTM, compliance, and international positioning.'
-    },
-    {
-      num: '10 · Global to India',
-      title: 'Cross-Border Inbound',
-      desc: 'For international companies seeking a trusted, senior India venture partner for engineering execution, market localization, and regulatory compliance.'
+      num: '08 · Global to India',
+      title: 'Cross-Border Inbound (Global & GCC)',
+      desc: 'Partnering with international ventures and GCC companies to execute local tech customization, engineering delivery, and market entry.'
     }
   ];
 
@@ -162,7 +152,7 @@ export default function HomePage() {
               Explore, shape, build, launch <em>and grow.</em>
             </h1>
             <p>
-              Ideacubator works with founders, domain professionals and builders to turn concepts into real, scalable ventures through structured product strategy, hands-on engineering, AI development and execution.
+              We partner with founders, domain experts, and builders to turn concepts into real, scalable ventures through structured product strategy, hands-on engineering, custom AI, and execution.
             </p>
             <div className="hero-actions">
               <Link className="primary" href="/submit-idea" style={{ padding: '13px 26px', fontSize: '14px' }}>
@@ -172,6 +162,9 @@ export default function HomePage() {
                 Watch how it works
               </button>
             </div>
+            <p style={{ margin: '10px 0 0', fontSize: '12.5px', color: 'var(--ink-3)', fontWeight: 500 }}>
+              No polished pitch deck required to start—just bring your core concept.
+            </p>
             <div className="hero-note">
               <span><b>✓</b> Founder-first venture building</span>
               <span><b>✓</b> Product, engineering &amp; AI</span>
@@ -272,7 +265,7 @@ export default function HomePage() {
                 </div>
                 <h3>Shape &amp; Blueprint</h3>
                 <p>
-                  Strip out bloat and carve a razor-sharp MVP specification and go-to-market wedge. We define the user journey, tech stack, database models, and practical AI opportunities that create an unfair advantage.
+                  Eliminate unnecessary complexity to carve a razor-sharp MVP specification and go-to-market wedge. We define the user journey, tech stack, database models, and practical AI opportunities that create an unfair advantage.
                 </p>
               </div>
               <div className="journey-deliverable">
@@ -331,7 +324,7 @@ export default function HomePage() {
                 </div>
                 <h3>Go-to-Market, Traction &amp; Scale</h3>
                 <p>
-                  Great code is useless without customer distribution. We partner directly on your go-to-market motion—onboarding initial paying cohorts, instrumenting user telemetry, refining positioning, and preparing clean institutional data rooms for angel and venture rounds.
+                  Even the best product needs systematic customer distribution to win. We partner directly on your go-to-market motion—onboarding initial paying cohorts, instrumenting user telemetry, refining positioning, and preparing clean institutional data rooms for angel and venture rounds.
                 </p>
               </div>
               <div className="journey-deliverable">
@@ -348,7 +341,7 @@ export default function HomePage() {
               <span>Execution at Founder Speed</span>
             </div>
             <p>
-              No arbitrary waiting periods. Focused validation sprints and initial discovery can close in days to a week, while complete software builds and go-to-market execution proceed with disciplined momentum.
+              Disciplined execution with immediate momentum—focused validation sprints begin in days, while complete software builds proceed with structured velocity.
             </p>
           </div>
         </div>
@@ -391,11 +384,11 @@ export default function HomePage() {
             <div>
               <div className="eyebrow">Starting Points</div>
               <h2 className="title" style={{ fontSize: 'clamp(24px, 2.8vw, 34px)', margin: '8px 0 10px' }}>
-                Who we build with.
+                Who We Build With
               </h2>
             </div>
             <p className="subtitle" style={{ maxWidth: '640px' }}>
-              Founders come to us at different stages of their journey. Choose the starting point that describes your current reality, and we tailor our execution model accordingly.
+              From early validation and deep-tech co-building to valuation and cross-border expansion, choose the starting point that fits your current reality.
             </p>
           </div>
 
@@ -435,13 +428,13 @@ export default function HomePage() {
               <div className="eyebrow">Behind Ideacubator</div>
               <h3>20+ years of technology, transformation and execution.</h3>
               <p>
-                Brijesh has spent over two decades designing and building software systems, leading complex technology transformations and driving digital initiatives across <strong>North America, Europe and APAC</strong>.
+                Brijesh has spent over two decades designing, architecting, and delivering software systems, leading complex technology transformations across <strong>North America, Europe and APAC</strong>.
               </p>
               <p>
-                His track record spans <strong>financial services and healthcare</strong>, taking concepts from initial strategic problem definition through architecture, product engineering and scaled delivery.
+                His industry track record spans <strong>financial services and healthcare</strong>, along with driving business development and scaling new APAC revenue streams for an American mid-scale technology company.
               </p>
               <p>
-                Over the past 5+ years, his focus has centered on <strong>AI and AI-powered product development</strong>, leveraging machine intelligence to radically accelerate how new ventures are conceived and built.
+                Over the past 5+ years, his focus has centered on <strong>AI and AI-powered product development</strong>. He has built numerous MVPs for in-house ideas and customer ventures, while actively mentoring founders from ideation to launch and advising startups on legal establishment and registrations through bodies like <strong>NASSCOM</strong>.
               </p>
               <p style={{ margin: '22px 0' }}>
                 <em>“What happens when a great idea meets the right experience, technology and execution?”</em>
@@ -527,6 +520,56 @@ export default function HomePage() {
       {/* ── BOTTOM CTA SECTION ── */}
       <section className="section cta-section" id="submit-section">
         <div className="container">
+          {/* ── FOUNDER TRUST & IP OWNERSHIP BANNER ── */}
+          <div
+            className="founder-trust-banner"
+            style={{
+              marginBottom: '32px',
+              padding: '24px 28px',
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, var(--cream) 0%, var(--surface) 100%)',
+              border: '1px solid var(--brown-soft)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '24px',
+              flexWrap: 'wrap'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', maxWidth: '820px' }}>
+              <div
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: 'var(--brown)',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  flexShrink: 0,
+                  marginTop: '2px'
+                }}
+              >
+                🔒
+              </div>
+              <div>
+                <h3 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: 700, color: 'var(--ink)' }}>
+                  Complete IP &amp; Founder Ownership
+                </h3>
+                <p style={{ margin: 0, fontSize: '14.5px', lineHeight: 1.6, color: 'var(--ink-2)' }}>
+                  You retain 100% ownership of your intellectual property, code, and trade secrets from day one. Mutual NDA and strict confidentiality guaranteed before every discovery session.
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--brown)', fontSize: '13px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+              <span>✓ 100% IP Retained</span>
+              <span style={{ opacity: 0.35 }}>•</span>
+              <span>✓ Mutual NDA</span>
+            </div>
+          </div>
+
           <div className="cta-box">
             <div className="eyebrow" style={{ color: '#ffd7c0' }}>Start with the idea</div>
             <h2>
