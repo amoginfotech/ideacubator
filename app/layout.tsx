@@ -7,23 +7,24 @@ import WhatsAppChatWidget from '@/components/WhatsAppChatWidget';
 export const metadata: Metadata = {
   metadataBase: new URL('https://ideacubator.in'),
   title: {
-    default: 'Ideacubator | Hands-On Venture Studio & AI Technical Co-Builder | Bangalore',
+    default: 'Ideacubator | Venture Studio & Early-Stage Investor | Bangalore',
     template: '%s — Ideacubator'
   },
   description:
-    'Ideacubator partners with founders and domain experts to build scalable ventures. Full-stack engineering, applied AI, product strategy, and GTM execution in Bangalore, India.',
+    'Ideacubator invests in high-conviction ideas. We invite applications from founders and domain experts, backing you with early-stage investment, hands-on engineering, custom AI, and GTM execution. No pitch deck required.',
   keywords: [
+    'early stage investor',
+    'startup investor Bangalore',
     'venture studio Bangalore',
     'venture studio India',
+    'seed investor India',
+    'invest in startup ideas',
     'AI co-builder',
     'technical co-founder Bangalore',
-    'AI technical co-builder',
     'startup incubator India',
-    'early stage venture builder',
     'MVP development',
-    'AI startup studio',
     'idea validation',
-    'go-to-market'
+    'pre-seed capital'
   ],
   authors: [{ name: 'Ideacubator' }],
   robots: {
@@ -41,24 +42,24 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Ideacubator',
     url: 'https://ideacubator.in',
-    title: 'Ideacubator — Turn Ideas into Scalable Companies',
+    title: 'Ideacubator — We Invest in High-Conviction Startup Ideas',
     description:
-      'Hands-on technical venture studio in Bangalore. We build production-grade software, AI workflows, and GTM strategies for founders and domain experts.',
+      'Early-stage venture studio & investor. We invite applications from founders, investing capital, hands-on engineering, and custom AI to build scalable ventures. No pitch deck required.',
     images: [
       {
         url: 'https://ideacubator.in/assets/img/og-preview.jpg',
         width: 1200,
         height: 630,
-        alt: 'Ideacubator — Turn Ideas into Scalable Companies'
+        alt: 'Ideacubator — We Invest in High-Conviction Startup Ideas'
       }
     ],
     locale: 'en_US'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ideacubator — Turn Ideas into Scalable Companies',
+    title: 'Ideacubator — We Invest in High-Conviction Startup Ideas',
     description:
-      'Hands-on technical venture studio in Bangalore. We build production-grade software, AI workflows, and GTM strategies for founders and domain experts.',
+      'Early-stage venture studio & investor. We invite applications from founders, investing capital, hands-on engineering, and custom AI to build scalable ventures. No pitch deck required.',
     images: ['https://ideacubator.in/assets/img/og-preview.jpg']
   }
 };
@@ -89,7 +90,7 @@ export default function RootLayout({
                   url: 'https://ideacubator.in/',
                   logo: 'https://ideacubator.in/assets/img/og-preview.jpg',
                   description:
-                    'Hands-on venture studio and technical co-builder helping founders build and launch companies.',
+                    'Early-stage venture studio & investor in Bangalore, India. We invite applications from founders, investing capital, hands-on engineering, and custom AI to build scalable ventures.',
                   founder: {
                     '@type': 'Person',
                     name: 'Brijesh'

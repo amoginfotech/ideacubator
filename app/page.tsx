@@ -36,7 +36,7 @@ export default function HomePage() {
     },
     {
       q: 'How does the Ideacubator partnership and commercial model work?',
-      a: 'We operate as an active venture co-builder, not an hourly fee contractor or academic program. Depending on your venture stage and starting point, our engagement model combines technical sweat equity, milestone-driven co-creation, and shared upside aligned with your success.'
+      a: 'We operate as an active early-stage venture investor and co-builder, not an hourly fee contractor or passive program. We invest capital, technical co-creation, and architecture alongside you in exchange for aligned venture equity, sharing the upside and risk from day zero.'
     },
     {
       q: 'Who owns the intellectual property (IP) of the idea and software?',
@@ -52,7 +52,7 @@ export default function HomePage() {
     },
     {
       q: 'Does Ideacubator invest capital directly or help raise funding?',
-      a: 'We co-invest our technical and architectural resources directly into the venture. Once validated with initial traction, we prepare your institutional data room and introduce your venture directly to qualified angel syndicates, family offices, and seed venture funds.'
+      a: 'Yes. We invest directly in high-conviction ideas through early capital and senior technical resources. Once initial traction is proven, we also prepare your institutional data room and syndicate follow-on rounds with qualified angels, family offices, and seed venture funds.'
     }
   ];
 
@@ -145,14 +145,14 @@ export default function HomePage() {
         <div className="container hero-grid">
           <div className="hero-copy">
             <div className="badge" style={{ marginBottom: '12px', background: 'var(--cream)', color: 'var(--brown)', fontSize: '11px', fontWeight: 700, padding: '5px 12px', border: '1px solid var(--brown-soft)', display: 'inline-flex' }}>
-              Hands-On Venture Studio &amp; Technical Co-Builder
+              Venture Studio &amp; Early-Stage Investor
             </div>
             <div className="eyebrow">Ideas into Companies</div>
             <h1>
               Explore, shape, build, launch <em>and grow.</em>
             </h1>
             <p>
-              We partner with founders, domain experts, and builders to turn concepts into real, scalable ventures through structured product strategy, hands-on engineering, custom AI, and execution.
+              We invest in and partner with ambitious founders, domain experts, and innovators to turn high-conviction ideas into scalable companies—backing you with capital, hands-on engineering, custom AI, and GTM execution.
             </p>
             <div className="hero-actions">
               <Link className="primary" href="/submit-idea" style={{ padding: '13px 26px', fontSize: '14px' }}>
@@ -166,9 +166,9 @@ export default function HomePage() {
               No polished pitch deck required to start—just bring your core concept.
             </p>
             <div className="hero-note">
-              <span><b>✓</b> Founder-first venture building</span>
-              <span><b>✓</b> Product, engineering &amp; AI</span>
-              <span><b>✓</b> From concept to launch</span>
+              <span><b>✓</b> We invest in early-stage ideas</span>
+              <span><b>✓</b> Capital, engineering &amp; AI</span>
+              <span><b>✓</b> 100% founder IP ownership</span>
             </div>
           </div>
 
