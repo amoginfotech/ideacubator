@@ -292,7 +292,10 @@ export default function DashboardPage() {
         body: formData
       });
 
-      if (!res.ok) throw new Error('Upload service returned error');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `Upload service returned status ${res.status}`);
+      }
       const data = await res.json();
 
       const newDoc = {

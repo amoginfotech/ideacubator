@@ -311,7 +311,8 @@ export default function SubmitIdeaPage() {
                 uploadedAt: data.uploadedAt || new Date().toISOString()
               });
             } else {
-              throw new Error('Upload API returned non-OK');
+              const errData = await res.json().catch(() => ({}));
+              throw new Error(errData.error || `Upload API returned status ${res.status}`);
             }
           } catch (uploadErr: any) {
             console.warn('Failed to upload file to storage:', file.name, uploadErr);

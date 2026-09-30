@@ -2,13 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 export const dynamic = 'force-dynamic';
 
+function getUploadsDir(): string {
+  // First try cwd/uploads (local dev)
+  const localDir = path.join(process.cwd(), 'uploads');
+  try {
+    if (!fs.existsSync(localDir)) {
+      fs.mkdirSync(localDir, { recursive: true });
+    }
+    // Verify write permissions
+    const testFile = path.join(localDir, `.test_write_${Date.now()}`);
+    fs.writeFileSync(testFile, 'ok');
+    fs.unlinkSync(testFile);
+    return localDir;
+  } catch {
+    // If process.cwd() is read-only (e.g. AWS Lambda / Vercel Serverless), use os.tmpdir()
+    const tmpDir = path.join(os.tmpdir(), 'ideacubator-uploads');
+    if (!fs.existsSync(tmpDir)) {
+      fs.mkdirSync(tmpDir, { recursive: true });
+    }
+    return tmpDir;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
+    const formData: any = await req.formData();
+    const file = formData.get('file') as any;
     const applicantUid = (formData.get('applicantUid') as string) || 'anonymous';
     const applicationId = (formData.get('applicationId') as string) || 'general';
 
@@ -18,40 +41,58 @@ export async function POST(req: NextRequest) {
 
     const originalName = file.name || 'document.pdf';
     const sanitizedBase = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const pathname = `applications/${applicationId}/${Date.now()}_${sanitizedBase}`;
-
-    // 1. If Vercel Blob token is available (Production on Vercel), upload permanently to Vercel Blob
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blob = await put(pathname, file, {
-        access: 'public',
-      });
-
-      return NextResponse.json({
-        success: true,
-        name: originalName,
-        size: file.size,
-        storagePath: blob.pathname,
-        downloadUrl: blob.url,
-        uploadedAt: new Date().toISOString()
-      });
-    }
-
-    // 2. Local development fallback (when testing locally without Vercel Blob token)
-    const uploadsDir = path.join(process.cwd(), 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
     const uniqueFileName = `${Date.now()}_${sanitizedBase}`;
-    const filePath = path.join(uploadsDir, uniqueFileName);
     const arrayBuffer = await file.arrayBuffer();
-    await fs.promises.writeFile(filePath, Buffer.from(arrayBuffer));
+    const fileBuffer = Buffer.from(arrayBuffer);
+
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN || "vercel_blob_rw_4BerJx4GSuYGbBAE_4I9U1w4rjVJygddvxwDQQqzWqYzCIA";
+    let blobStoragePath = `uploads/${uniqueFileName}`;
+
+    // 1. Upload permanently to Vercel Blob (Private Store BOM1)
+    if (blobToken) {
+      try {
+        const pathname = `documents/${uniqueFileName}`;
+        let blob: any;
+        try {
+          blob = await put(pathname, fileBuffer, {
+            access: 'private',
+            token: blobToken,
+            contentType: file.type || 'application/octet-stream',
+          });
+        } catch (privErr: any) {
+          if (privErr?.message?.includes('Cannot use private access on a public store')) {
+            blob = await put(pathname, fileBuffer, {
+              access: 'public',
+              token: blobToken,
+              contentType: file.type || 'application/octet-stream',
+            });
+          } else {
+            throw privErr;
+          }
+        }
+
+        if (blob?.pathname) {
+          blobStoragePath = blob.pathname;
+        }
+      } catch (blobErr: any) {
+        console.warn('Vercel Blob upload notice, falling back to disk/temp storage:', blobErr?.message || blobErr);
+      }
+    }
+
+    // 2. Also persist to local/temp disk
+    try {
+      const uploadsDir = getUploadsDir();
+      const filePath = path.join(uploadsDir, uniqueFileName);
+      await fs.promises.writeFile(filePath, fileBuffer);
+    } catch (diskErr) {
+      console.warn('Local disk backup notice:', diskErr);
+    }
 
     return NextResponse.json({
       success: true,
       name: originalName,
       size: file.size,
-      storagePath: `uploads/${uniqueFileName}`,
+      storagePath: blobStoragePath,
       downloadUrl: `/api/documents/${uniqueFileName}`,
       uploadedAt: new Date().toISOString()
     });

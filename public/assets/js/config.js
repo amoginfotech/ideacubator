@@ -15,7 +15,7 @@
       apiKey: "AIzaSyDHPuZ7fAXInpVSPF5Ki7qJwBYfRUlJ2A4",
       authDomain: "rational-world-330006.firebaseapp.com",
       projectId: "rational-world-330006",
-      storageBucket: "rational-world-330006.firebasestorage.app",
+      storageBucket: "rational-world-330006.appspot.com",
       messagingSenderId: "115200442212",
       appId: "1:115200442212:web:b2cd9d4d48738da9ed4471",
       measurementId: "G-GJ77HJH9TQ"

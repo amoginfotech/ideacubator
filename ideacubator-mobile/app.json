@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Ideacubator",
+    "slug": "ideacubator-mobile",
+    "scheme": "ideacubator",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "primaryColor": "#8f3f17",
+    "splash": {
+      "backgroundColor": "#121214",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.ideacubator.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#121214",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "in.ideacubator.app",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

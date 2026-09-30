@@ -182,7 +182,7 @@ export default function HomePage() {
           {/* VIDEO INTRO CARD */}
           <div className="video-card">
             <div className="video-shell">
-              <video className="video-bg" playsInline muted loop autoPlay preload="auto">
+              <video className="video-bg" playsInline muted loop autoPlay preload="metadata">
                 <source src="/assets/hero-video.mp4" type="video/mp4" />
               </video>
               <div className="video-art">
@@ -554,7 +554,7 @@ export default function HomePage() {
           <button className="modal-close" type="button" aria-label="Close video" onClick={handleCloseVideo}>
             ×
           </button>
-          <video ref={modalVideoRef} className="video-frame" controls playsInline preload="auto">
+          <video ref={modalVideoRef} className="video-frame" controls playsInline preload="metadata">
             <source src="/assets/hero-video.mp4" type="video/mp4" />
             Your browser does not support HTML5 video.
           </video>
